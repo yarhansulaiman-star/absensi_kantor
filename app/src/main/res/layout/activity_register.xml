@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F4F8"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#1565C0"
+            android:paddingTop="32dp"
+            android:paddingBottom="32dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👤"
+                android:textSize="48sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daftar Akun Baru"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lengkapi data dan ambil 3 foto wajah"
+                android:textSize="13sp"
+                android:textColor="#BBDEFB"
+                android:layout_marginTop="4dp"/>
+
+        </LinearLayout>
+
+        <!-- FORM CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Informasi Akun"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#1565C0"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- USERNAME -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Username *"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Masukkan username"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:background="@drawable/bg_input_field"
+                    android:inputType="textNoSuggestions"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- PASSWORD -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Password *"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Masukkan password"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:background="@drawable/bg_input_field"
+                    android:inputType="textPassword"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- EMAIL -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email *"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Masukkan email"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:background="@drawable/bg_input_field"
+                    android:inputType="textEmailAddress"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- JABATAN -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jabatan *"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/etJabatan"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Contoh: Staff IT"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:background="@drawable/bg_input_field"
+                    android:inputType="textCapWords"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- DEPARTEMEN -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Departemen *"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="4dp"/>
+                <EditText
+                    android:id="@+id/etDepartemen"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Contoh: IT"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:background="@drawable/bg_input_field"
+                    android:inputType="textCapWords"
+                    android:layout_marginBottom="4dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- FOTO CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foto Wajah"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#1565C0"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ambil 3 foto dari sudut berbeda"
+                    android:textSize="12sp"
+                    android:textColor="#9E9E9E"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- FOTO 1 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foto 1 — Menghadap depan"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#555555"
+                    android:layout_marginBottom="6dp"/>
+                <ImageView
+                    android:id="@+id/imgFoto1"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:background="#E8EAF6"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_menu_camera"/>
+                <Button
+                    android:id="@+id/btnFoto1"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:text="📷  Ambil Foto 1"
+                    android:backgroundTint="#1976D2"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- FOTO 2 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foto 2 — Sedikit ke kiri"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#555555"
+                    android:layout_marginBottom="6dp"/>
+                <ImageView
+                    android:id="@+id/imgFoto2"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:background="#E8EAF6"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_menu_camera"/>
+                <Button
+                    android:id="@+id/btnFoto2"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:text="📷  Ambil Foto 2"
+                    android:backgroundTint="#1976D2"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- FOTO 3 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foto 3 — Sedikit ke kanan"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#555555"
+                    android:layout_marginBottom="6dp"/>
+                <ImageView
+                    android:id="@+id/imgFoto3"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:background="#E8EAF6"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_menu_camera"/>
+                <Button
+                    android:id="@+id/btnFoto3"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:text="📷  Ambil Foto 3"
+                    android:backgroundTint="#1976D2"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="4dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- PROGRESS & TOMBOL DAFTAR -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btnDaftar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="DAFTAR SEKARANG"
+            android:backgroundTint="#1565C0"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,155 @@
+package com.example.absensi_kantor;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
+import android.widget.Toast;
+
+import com.example.absensi_kantor.api.ApiClient;
+import com.example.absensi_kantor.api.SessionManager;
+import com.example.absensi_kantor.databinding.ActivityMainBinding;
+import com.example.absensi_kantor.ui.AbsenActivity;
+import com.example.absensi_kantor.ui.GajiActivity;
+import com.example.absensi_kantor.ui.LaporanActivity;
+import com.example.absensi_kantor.ui.LoginActivity;
+import com.example.absensi_kantor.ui.RiwayatActivity;
+import com.example.absensi_kantor.utils.DateUtils;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ActivityMainBinding binding;
+    private SessionManager session;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // Reset & init ApiClient
+        ApiClient.reset();
+        ApiClient.init(this);
+        session = new SessionManager(this);
+
+        // Setup toolbar
+        setSupportActionBar(binding.toolbar);
+
+        // Isi header
+        binding.labelWelcome.setText("Selamat datang, " + session.getUsername() + "!");
+        binding.labelRole.setText("Role: " + session.getRole());
+
+        // Tampilkan menu Kelola Gaji hanya untuk HRD/Admin
+        String role = session.getRole();
+        if ("hrd".equals(role) || "admin".equals(role)) {
+            binding.cardGaji.setVisibility(View.VISIBLE);
+        } else {
+            binding.cardGaji.setVisibility(View.GONE);
+        }
+
+        // ── Listener menu grid ──────────────────────────────────────────
+        binding.tombolAbsen.setOnClickListener(v ->
+                startActivity(new Intent(this, AbsenActivity.class)));
+
+        binding.tombolLaporan.setOnClickListener(v ->
+                startActivity(new Intent(this, LaporanActivity.class)));
+
+        binding.tombolRiwayat.setOnClickListener(v ->
+                startActivity(new Intent(this, RiwayatActivity.class)));
+
+        binding.tombolExportPdf.setOnClickListener(v -> exportPdf());
+
+        binding.tombolGaji.setOnClickListener(v ->
+                startActivity(new Intent(this, GajiActivity.class)));
+
+        // ── Bottom Navigation ───────────────────────────────────────────
+        binding.bottomNav.setSelectedItemId(R.id.nav_home);
+        binding.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                return true;
+            } else if (id == R.id.nav_riwayat) {
+                startActivity(new Intent(this, RiwayatActivity.class));
+                return true;
+            } else if (id == R.id.nav_laporan) {
+                startActivity(new Intent(this, LaporanActivity.class));
+                return true;
+            } else if (id == R.id.nav_logout) {
+                session.clearSession();
+                ApiClient.reset();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    // ── Export PDF ──────────────────────────────────────────────────────
+    private void exportPdf() {
+        binding.tombolExportPdf.setEnabled(false);
+        Toast.makeText(this, "⏳ Mengunduh PDF...", Toast.LENGTH_SHORT).show();
+
+        String tanggal = DateUtils.getTanggalHariIni();
+
+        ApiClient.getService().laporanPdf(tanggal)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call,
+                                           Response<ResponseBody> response) {
+                        binding.tombolExportPdf.setEnabled(true);
+                        if (response.isSuccessful() && response.body() != null) {
+                            simpanPdf(response.body(), tanggal);
+                        } else {
+                            Toast.makeText(MainActivity.this,
+                                    "Gagal download PDF!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        binding.tombolExportPdf.setEnabled(true);
+                        Toast.makeText(MainActivity.this,
+                                "Koneksi gagal: " + t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void simpanPdf(ResponseBody body, String tanggal) {
+        try {
+            File dir  = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+            File file = new File(dir, "laporan_" + tanggal + ".pdf");
+
+            InputStream      is     = body.byteStream();
+            FileOutputStream fos    = new FileOutputStream(file);
+            byte[]           buffer = new byte[4096];
+            int              read;
+            while ((read = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, read);
+            }
+            fos.flush();
+            fos.close();
+            is.close();
+
+            Toast.makeText(this,
+                    "✅ PDF disimpan:\n" + file.getAbsolutePath(),
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this,
+                    "Gagal simpan PDF: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+}

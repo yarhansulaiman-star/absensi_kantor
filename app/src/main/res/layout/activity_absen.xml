@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F6FA">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1A1A2E"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📷 Absen Wajah"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
+
+    </LinearLayout>
+
+    <!-- Label lokasi realtime -->
+    <TextView
+        android:id="@+id/labelLokasi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:paddingHorizontal="12dp"
+        android:text="📍 Mendapatkan lokasi..."
+        android:textSize="11sp"
+        android:textColor="#444444"
+        android:background="#E8E8E8"
+        android:singleLine="false"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+    <!-- Preview Kamera -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewKamera"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Status hasil absen (scrollable) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="130dp">
+
+        <TextView
+            android:id="@+id/labelStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:text="Arahkan wajah ke kamera lalu tekan tombol absen"
+            android:textSize="12sp"
+            android:textColor="#333333"
+            android:gravity="center" />
+
+    </ScrollView>
+
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <!-- Tombol -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/tombolKembali"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="← Kembali"
+            android:backgroundTint="#AAAAAA" />
+
+        <Button
+            android:id="@+id/tombolAbsen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="✅ Absen Sekarang"
+            android:backgroundTint="#1A1A2E" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_logo">Logo</string>
+    <string name="app_title">Absensi Karyawan</string>
+    <string name="subtitle_login">Masuk untuk melanjutkan</string>
+    <string name="welcome">Selamat Datang 👋</string>
+    <string name="subtitle_welcome">Silakan masuk dengan akun Anda</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_masuk">MASUK</string>
+    <string name="btn_daftar">DAFTAR AKUN BARU</string>
+    <string name="label_atau">  atau  </string>
+    <string name="footer_text">© 2025 Sistem Absensi Karyawan</string>
+    <string name="app_name">Absensi Kantor</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="absen">Absen Sekarang</string>
+    <string name="laporan">Lihat Laporan</string>
+    <string name="logout">Logout</string>
+    <string name="loading">Memproses...</string>
+    <string name="error_koneksi">Gagal konek ke server!</string>
+
+    <!-- ── Gaji ── -->
+    <string name="label_nama_karyawan">Nama Karyawan</string>
+    <string name="label_jabatan">Jabatan</string>
+    <string name="label_periode">Periode: -</string>
+    <string name="label_pilih_periode">Pilih Periode</string>
+    <string name="label_cari">Cari</string>
+    <string name="label_penghasilan">Penghasilan</string>
+    <string name="label_gaji_pokok">Gaji Pokok</string>
+    <string name="label_tunjangan_transport">Tunjangan Transport</string>
+    <string name="label_tunjangan_makan">Tunjangan Makan</string>
+    <string name="label_tunjangan_jabatan">Tunjangan Jabatan</string>
+    <string name="label_uang_lembur">Uang Lembur</string>
+    <string name="label_total_penghasilan">Total Penghasilan</string>
+    <string name="label_potongan">Potongan</string>
+    <string name="label_keterlambatan">Keterlambatan</string>
+    <string name="label_alpha">Alpha (tidak hadir)</string>
+    <string name="label_bpjs_kesehatan">BPJS Kesehatan (1%)</string>
+    <string name="label_bpjs_tk">BPJS Ketenagakerjaan (2%)</string>
+    <string name="label_pph21">PPh 21 (5%)</string>
+    <string name="label_total_potongan">Total Potongan</string>
+    <string name="label_gaji_bersih">GAJI BERSIH</string>
+    <string name="label_export_slip">Export Slip Gaji PDF</string>
+    <string name="default_rp">Rp 0</string>
+    <string name="default_minus_rp">- Rp 0</string>
+
+    <!-- ── Tambahan untuk activity_gaji.xml ── -->
+    <string name="label_btn_input_gaji">Input Data Gaji Karyawan</string>
+    <string name="label_btn_export_slip">Export Slip Gaji PDF</string>
+
+    <!-- ── Tambahan untuk activity_set_gaji.xml ── -->
+    <string name="label_input_data_gaji">Input Data Gaji</string>
+    <string name="label_atur_komponen">Atur komponen gaji karyawan</string>
+    <string name="label_pilih_karyawan">Pilih Karyawan</string>
+    <string name="label_komponen_gaji">Komponen Gaji</string>
+    <string name="label_gaji_pokok_input">Gaji Pokok (Rp) *</string>
+    <string name="hint_gaji_pokok">Contoh: 5000000</string>
+    <string name="label_tunjangan_transport_input">Tunjangan Transport (Rp)</string>
+    <string name="hint_tunjangan_transport">Contoh: 500000</string>
+    <string name="label_tunjangan_makan_input">Tunjangan Makan (Rp)</string>
+    <string name="hint_tunjangan_makan">Contoh: 300000</string>
+    <string name="label_tunjangan_jabatan_input">Tunjangan Jabatan (Rp)</string>
+    <string name="hint_tunjangan_jabatan">Contoh: 700000</string>
+    <string name="label_btn_simpan_gaji">SIMPAN DATA GAJI</string>
+</resources>
