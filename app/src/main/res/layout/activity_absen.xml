@@ -40,12 +40,24 @@
         android:maxLines="2"
         android:ellipsize="end" />
 
-    <!-- Preview Kamera -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/previewKamera"
+    <!-- ✅ Preview Kamera + Overlay titik wajah -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/previewKamera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- ✅ Overlay titik wajah ML Kit -->
+        <com.example.absensi_kantor.ui.FaceOverlayView
+            android:id="@+id/faceOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
     <!-- Status hasil absen (scrollable) -->
     <ScrollView

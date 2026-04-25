@@ -14,9 +14,10 @@ import com.example.absensi_kantor.ui.AbsenActivity;
 import com.example.absensi_kantor.ui.GajiActivity;
 import com.example.absensi_kantor.ui.LaporanActivity;
 import com.example.absensi_kantor.ui.LoginActivity;
+import com.example.absensi_kantor.ui.ProfilActivity;
 import com.example.absensi_kantor.ui.RiwayatActivity;
+import com.example.absensi_kantor.ui.SuratIzinActivity;
 import com.example.absensi_kantor.utils.DateUtils;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,19 +39,15 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Reset & init ApiClient
         ApiClient.reset();
         ApiClient.init(this);
         session = new SessionManager(this);
 
-        // Setup toolbar
         setSupportActionBar(binding.toolbar);
 
-        // Isi header
         binding.labelWelcome.setText("Selamat datang, " + session.getUsername() + "!");
         binding.labelRole.setText("Role: " + session.getRole());
 
-        // Tampilkan menu Kelola Gaji hanya untuk HRD/Admin
         String role = session.getRole();
         if ("hrd".equals(role) || "admin".equals(role)) {
             binding.cardGaji.setVisibility(View.VISIBLE);
@@ -58,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             binding.cardGaji.setVisibility(View.GONE);
         }
 
-        // ── Listener menu grid ──────────────────────────────────────────
+        // ── Listener menu ──────────────────────────────────────────
         binding.tombolAbsen.setOnClickListener(v ->
                 startActivity(new Intent(this, AbsenActivity.class)));
 
@@ -73,10 +70,15 @@ public class MainActivity extends AppCompatActivity {
         binding.tombolGaji.setOnClickListener(v ->
                 startActivity(new Intent(this, GajiActivity.class)));
 
-        // ── Bottom Navigation ───────────────────────────────────────────
+        // ── Surat Izin ──────────────────────────────────────────────
+        binding.tombolSuratIzin.setOnClickListener(v ->
+                startActivity(new Intent(this, SuratIzinActivity.class)));
+
+        // ── Bottom Navigation ───────────────────────────────────────
         binding.bottomNav.setSelectedItemId(R.id.nav_home);
         binding.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+
             if (id == R.id.nav_home) {
                 return true;
             } else if (id == R.id.nav_riwayat) {
@@ -85,18 +87,15 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_laporan) {
                 startActivity(new Intent(this, LaporanActivity.class));
                 return true;
-            } else if (id == R.id.nav_logout) {
-                session.clearSession();
-                ApiClient.reset();
-                startActivity(new Intent(this, LoginActivity.class));
-                finish();
+            } else if (id == R.id.nav_profil) {
+                startActivity(new Intent(this, ProfilActivity.class));
                 return true;
             }
+
             return false;
         });
     }
 
-    // ── Export PDF ──────────────────────────────────────────────────────
     private void exportPdf() {
         binding.tombolExportPdf.setEnabled(false);
         Toast.makeText(this, "⏳ Mengunduh PDF...", Toast.LENGTH_SHORT).show();
@@ -132,13 +131,15 @@ public class MainActivity extends AppCompatActivity {
             File dir  = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
             File file = new File(dir, "laporan_" + tanggal + ".pdf");
 
-            InputStream      is     = body.byteStream();
-            FileOutputStream fos    = new FileOutputStream(file);
-            byte[]           buffer = new byte[4096];
-            int              read;
+            InputStream is = body.byteStream();
+            FileOutputStream fos = new FileOutputStream(file);
+            byte[] buffer = new byte[4096];
+            int read;
+
             while ((read = is.read(buffer)) != -1) {
                 fos.write(buffer, 0, read);
             }
+
             fos.flush();
             fos.close();
             is.close();
@@ -146,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,
                     "✅ PDF disimpan:\n" + file.getAbsolutePath(),
                     Toast.LENGTH_LONG).show();
+
         } catch (Exception e) {
             Toast.makeText(this,
                     "Gagal simpan PDF: " + e.getMessage(),

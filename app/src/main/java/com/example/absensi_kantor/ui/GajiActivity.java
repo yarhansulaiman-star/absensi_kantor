@@ -1,20 +1,35 @@
 package com.example.absensi_kantor.ui;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
-import com.example.absensi_kantor.api.ApiService;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.model.GajiResponse;
 import com.example.absensi_kantor.model.GajiResponse.GajiData;
+import com.example.absensi_kantor.model.KaryawanListResponse;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -24,10 +39,11 @@ import retrofit2.Response;
 public class GajiActivity extends AppCompatActivity {
 
     // ── Views ─────────────────────────────────────────────────────────
-    private TextView    tvNamaKaryawan, tvJabatan, tvPeriode;
-    private Spinner     spinnerBulan, spinnerTahun;
-    private Button      btnCariGaji, btnExportSlip, btnInputGaji;  // ← tambah btnInputGaji
-    private ProgressBar progressBar;
+    private TextView     tvNamaKaryawan, tvJabatan, tvPeriode;
+    private Spinner      spinnerBulan, spinnerTahun, spinnerKaryawan;
+    private LinearLayout layoutSpinnerKaryawan;
+    private Button       btnCariGaji, btnExportSlip, btnInputGaji;
+    private ProgressBar  progressBar;
 
     private TextView tvGajiPokok, tvTunjanganTransport, tvTunjanganMakan;
     private TextView tvTunjanganJabatan, tvUangLembur, tvTotalPenghasilan;
@@ -39,6 +55,8 @@ public class GajiActivity extends AppCompatActivity {
     // ── Data ──────────────────────────────────────────────────────────
     private SessionManager sessionManager;
     private GajiData       currentGajiData;
+    private List<KaryawanListResponse.Item> karyawanList = new ArrayList<>();
+    private int selectedKaryawanId = -1;
 
     private final String[] NAMA_BULAN = {
             "Januari","Februari","Maret","April","Mei","Juni",
@@ -57,18 +75,20 @@ public class GajiActivity extends AppCompatActivity {
         setupSpinner();
         setupListeners();
 
-        // Tampilkan tombol Input Gaji hanya untuk HRD/admin
         String role = sessionManager.getRole();
         if (role.equals("hrd") || role.equals("admin")) {
             btnInputGaji.setVisibility(View.VISIBLE);
+            layoutSpinnerKaryawan.setVisibility(View.VISIBLE);
+            loadKaryawanList();
         } else {
             btnInputGaji.setVisibility(View.GONE);
+            layoutSpinnerKaryawan.setVisibility(View.GONE);
+            selectedKaryawanId = sessionManager.getUserId();
+            int bulan = Calendar.getInstance().get(Calendar.MONTH) + 1;
+            int tahun = Calendar.getInstance().get(Calendar.YEAR);
+            spinnerBulan.setSelection(bulan - 1);
+            loadGaji(bulan, tahun);
         }
-
-        int bulan = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        int tahun = Calendar.getInstance().get(Calendar.YEAR);
-        spinnerBulan.setSelection(bulan - 1);
-        loadGaji(bulan, tahun);
     }
 
     // ── Init views ────────────────────────────────────────────────────
@@ -78,8 +98,10 @@ public class GajiActivity extends AppCompatActivity {
         tvPeriode             = findViewById(R.id.tvPeriode);
         spinnerBulan          = findViewById(R.id.spinnerBulan);
         spinnerTahun          = findViewById(R.id.spinnerTahun);
+        spinnerKaryawan       = findViewById(R.id.spinnerKaryawan);
+        layoutSpinnerKaryawan = findViewById(R.id.layoutSpinnerKaryawan);
         btnCariGaji           = findViewById(R.id.btnCariGaji);
-        btnInputGaji          = findViewById(R.id.btnInputGaji);   // ← tambah
+        btnInputGaji          = findViewById(R.id.btnInputGaji);
         progressBar           = findViewById(R.id.progressBar);
         tvGajiPokok           = findViewById(R.id.tvGajiPokok);
         tvTunjanganTransport  = findViewById(R.id.tvTunjanganTransport);
@@ -120,25 +142,76 @@ public class GajiActivity extends AppCompatActivity {
         btnCariGaji.setOnClickListener(v -> {
             int bulan = spinnerBulan.getSelectedItemPosition() + 1;
             int tahun = Integer.parseInt(spinnerTahun.getSelectedItem().toString());
+
+            String role = sessionManager.getRole();
+            if ((role.equals("hrd") || role.equals("admin")) && !karyawanList.isEmpty()) {
+                selectedKaryawanId = karyawanList.get(spinnerKaryawan.getSelectedItemPosition()).id;
+            }
+
+            if (selectedKaryawanId <= 0) {
+                Toast.makeText(this, "Pilih karyawan terlebih dahulu", Toast.LENGTH_SHORT).show();
+                return;
+            }
             loadGaji(bulan, tahun);
         });
 
         btnExportSlip.setOnClickListener(v -> exportSlipGaji());
 
-        // ← tambah listener Input Gaji
         btnInputGaji.setOnClickListener(v ->
                 startActivity(new Intent(GajiActivity.this, SetGajiActivity.class))
         );
     }
 
-    // ── Load data ─────────────────────────────────────────────────────
+    // ── Load daftar karyawan untuk HRD ───────────────────────────────
+    private void loadKaryawanList() {
+        progressBar.setVisibility(View.VISIBLE);
+        ApiClient.getService().getKaryawanList().enqueue(new Callback<KaryawanListResponse>() {
+            @Override
+            public void onResponse(Call<KaryawanListResponse> call,
+                                   Response<KaryawanListResponse> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().sukses) {
+                    karyawanList = response.body().data;
+                    List<String> namaList = new ArrayList<>();
+                    for (KaryawanListResponse.Item item : karyawanList) {
+                        namaList.add(item.nama + " — " + item.jabatan);
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            GajiActivity.this,
+                            android.R.layout.simple_spinner_dropdown_item,
+                            namaList);
+                    spinnerKaryawan.setAdapter(adapter);
+
+                    if (!karyawanList.isEmpty()) {
+                        selectedKaryawanId = karyawanList.get(0).id;
+                        int bulan = Calendar.getInstance().get(Calendar.MONTH) + 1;
+                        int tahun = Calendar.getInstance().get(Calendar.YEAR);
+                        spinnerBulan.setSelection(bulan - 1);
+                        loadGaji(bulan, tahun);
+                    }
+                } else {
+                    Toast.makeText(GajiActivity.this,
+                            "Gagal memuat daftar karyawan", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<KaryawanListResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(GajiActivity.this,
+                        "Koneksi gagal: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // ── Load data gaji ────────────────────────────────────────────────
     private void loadGaji(int bulan, int tahun) {
         progressBar.setVisibility(View.VISIBLE);
         btnCariGaji.setEnabled(false);
 
         ApiClient.getService().getGaji(
-                sessionManager.getUserId(), bulan, tahun,
-                "Bearer " + sessionManager.getToken()
+                selectedKaryawanId, bulan, tahun
         ).enqueue(new Callback<GajiResponse>() {
 
             @Override
@@ -159,8 +232,11 @@ public class GajiActivity extends AppCompatActivity {
                     tampilkanGaji(currentGajiData);
 
                 } else {
-                    Toast.makeText(GajiActivity.this,
-                            "Gagal memuat data gaji", Toast.LENGTH_SHORT).show();
+                    String pesan = "Gagal memuat data gaji";
+                    if (response.body() != null && response.body().pesan != null) {
+                        pesan = response.body().pesan;
+                    }
+                    Toast.makeText(GajiActivity.this, pesan, Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -197,6 +273,9 @@ public class GajiActivity extends AppCompatActivity {
         tvGajiBersih.setText(formatRupiah(d.gaji_bersih));
 
         tampilkanDetailTerlambat(d);
+
+        // Tampilkan tombol export setelah data berhasil dimuat
+        btnExportSlip.setVisibility(View.VISIBLE);
     }
 
     private void tampilkanDetailTerlambat(GajiData d) {
@@ -226,30 +305,156 @@ public class GajiActivity extends AppCompatActivity {
             Toast.makeText(this, "Data gaji belum dimuat", Toast.LENGTH_SHORT).show();
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("SLIP GAJI\n=================================\n");
-        sb.append("Nama    : ").append(currentGajiData.nama).append("\n");
-        sb.append("Jabatan : ").append(currentGajiData.jabatan).append("\n");
-        sb.append("Periode : ").append(currentGajiData.periode).append("\n");
-        sb.append("=================================\n\nPENGHASILAN\n");
-        sb.append("Gaji Pokok          : ").append(formatRupiah(currentGajiData.gaji_pokok)).append("\n");
-        sb.append("Tunjangan Transport : ").append(formatRupiah(currentGajiData.tunjangan_transport)).append("\n");
-        sb.append("Tunjangan Makan     : ").append(formatRupiah(currentGajiData.tunjangan_makan)).append("\n");
-        sb.append("Tunjangan Jabatan   : ").append(formatRupiah(currentGajiData.tunjangan_jabatan)).append("\n");
-        sb.append("Uang Lembur         : ").append(formatRupiah(currentGajiData.uang_lembur)).append("\n");
-        sb.append("Total Penghasilan   : ").append(formatRupiah(currentGajiData.total_penghasilan)).append("\n\n");
-        sb.append("POTONGAN\n");
-        sb.append("Keterlambatan       : ").append(formatRupiah(currentGajiData.potongan_terlambat)).append("\n");
-        sb.append("Alpha               : ").append(formatRupiah(currentGajiData.potongan_alpha)).append("\n");
-        sb.append("BPJS Kesehatan      : ").append(formatRupiah(currentGajiData.bpjs_kesehatan)).append("\n");
-        sb.append("BPJS TK             : ").append(formatRupiah(currentGajiData.bpjs_tk)).append("\n");
-        sb.append("PPh 21              : ").append(formatRupiah(currentGajiData.pph21)).append("\n");
-        sb.append("Total Potongan      : ").append(formatRupiah(currentGajiData.total_potongan)).append("\n\n");
-        sb.append("=================================\n");
-        sb.append("GAJI BERSIH         : ").append(formatRupiah(currentGajiData.gaji_bersih)).append("\n");
-        sb.append("=================================\n");
 
-        Toast.makeText(this, "Slip gaji berhasil diexport!", Toast.LENGTH_SHORT).show();
+        GajiData d = currentGajiData;
+        String namaFile = "slip_gaji_" + d.nama.replace(" ", "_")
+                + "_" + d.periode.replace(" ", "_") + ".pdf";
+
+        // Buat dokumen PDF
+        PdfDocument pdfDocument = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create(); // A4
+        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+        Canvas canvas = page.getCanvas();
+
+        // ── Paint ──
+        Paint paintJudul = new Paint();
+        paintJudul.setTextSize(18f);
+        paintJudul.setFakeBoldText(true);
+        paintJudul.setColor(Color.BLACK);
+
+        Paint paintSubJudul = new Paint();
+        paintSubJudul.setTextSize(13f);
+        paintSubJudul.setFakeBoldText(true);
+        paintSubJudul.setColor(Color.parseColor("#1565C0"));
+
+        Paint paintNormal = new Paint();
+        paintNormal.setTextSize(11f);
+        paintNormal.setColor(Color.BLACK);
+
+        Paint paintGaris = new Paint();
+        paintGaris.setColor(Color.LTGRAY);
+        paintGaris.setStrokeWidth(1f);
+
+        Paint paintTotal = new Paint();
+        paintTotal.setTextSize(11f);
+        paintTotal.setFakeBoldText(true);
+        paintTotal.setColor(Color.parseColor("#1565C0"));
+
+        Paint paintBersih = new Paint();
+        paintBersih.setTextSize(14f);
+        paintBersih.setFakeBoldText(true);
+        paintBersih.setColor(Color.WHITE);
+
+        Paint paintBgBersih = new Paint();
+        paintBgBersih.setColor(Color.parseColor("#388E3C"));
+
+        int margin = 40;
+        int y = 50;
+        int col1 = margin;
+        int col2 = 350;
+
+        // ── Header ──
+        canvas.drawText("SLIP GAJI KARYAWAN", margin, y, paintJudul);
+        y += 6;
+        canvas.drawLine(margin, y, 555, y, paintGaris);
+        y += 20;
+
+        canvas.drawText("Nama    : " + d.nama, margin, y, paintNormal);
+        y += 18;
+        canvas.drawText("Jabatan : " + d.jabatan, margin, y, paintNormal);
+        y += 18;
+        canvas.drawText("Periode : " + d.periode, margin, y, paintNormal);
+        y += 10;
+        canvas.drawLine(margin, y, 555, y, paintGaris);
+        y += 20;
+
+        // ── Penghasilan ──
+        canvas.drawText("PENGHASILAN", margin, y, paintSubJudul);
+        y += 18;
+        canvas.drawText("Gaji Pokok", col1, y, paintNormal);
+        canvas.drawText(formatRupiah(d.gaji_pokok), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("Tunjangan Transport", col1, y, paintNormal);
+        canvas.drawText(formatRupiah(d.tunjangan_transport), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("Tunjangan Makan", col1, y, paintNormal);
+        canvas.drawText(formatRupiah(d.tunjangan_makan), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("Tunjangan Jabatan", col1, y, paintNormal);
+        canvas.drawText(formatRupiah(d.tunjangan_jabatan), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("Uang Lembur", col1, y, paintNormal);
+        canvas.drawText(formatRupiah(d.uang_lembur), col2, y, paintNormal);
+        y += 10;
+        canvas.drawLine(margin, y, 555, y, paintGaris);
+        y += 14;
+        canvas.drawText("Total Penghasilan", col1, y, paintTotal);
+        canvas.drawText(formatRupiah(d.total_penghasilan), col2, y, paintTotal);
+        y += 20;
+
+        // ── Potongan ──
+        canvas.drawText("POTONGAN", margin, y, paintSubJudul);
+        y += 18;
+        canvas.drawText("Keterlambatan", col1, y, paintNormal);
+        canvas.drawText("- " + formatRupiah(d.potongan_terlambat), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("Alpha (" + d.jumlah_hari_alpha + " hari)", col1, y, paintNormal);
+        canvas.drawText("- " + formatRupiah(d.potongan_alpha), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("BPJS Kesehatan (1%)", col1, y, paintNormal);
+        canvas.drawText("- " + formatRupiah(d.bpjs_kesehatan), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("BPJS Ketenagakerjaan (2%)", col1, y, paintNormal);
+        canvas.drawText("- " + formatRupiah(d.bpjs_tk), col2, y, paintNormal);
+        y += 16;
+        canvas.drawText("PPh 21 (5%)", col1, y, paintNormal);
+        canvas.drawText("- " + formatRupiah(d.pph21), col2, y, paintNormal);
+        y += 10;
+        canvas.drawLine(margin, y, 555, y, paintGaris);
+        y += 14;
+        canvas.drawText("Total Potongan", col1, y, paintTotal);
+        canvas.drawText("- " + formatRupiah(d.total_potongan), col2, y, paintTotal);
+        y += 24;
+
+        // ── Gaji Bersih ──
+        canvas.drawRect(margin, y - 18, 555, y + 10, paintBgBersih);
+        canvas.drawText("GAJI BERSIH", margin + 10, y, paintBersih);
+        canvas.drawText(formatRupiah(d.gaji_bersih), col2, y, paintBersih);
+
+        pdfDocument.finishPage(page);
+
+        // ── Simpan file ──
+        try {
+            OutputStream outputStream;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // Android 10+ pakai MediaStore
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Downloads.DISPLAY_NAME, namaFile);
+                values.put(MediaStore.Downloads.MIME_TYPE, "application/pdf");
+                values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+                Uri uri = getContentResolver().insert(
+                        MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                outputStream = getContentResolver().openOutputStream(uri);
+            } else {
+                // Android 9 ke bawah
+                File folder = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS);
+                File file = new File(folder, namaFile);
+                outputStream = new FileOutputStream(file);
+            }
+
+            pdfDocument.writeTo(outputStream);
+            outputStream.close();
+            pdfDocument.close();
+
+            Toast.makeText(this, "Slip disimpan di Downloads:\n" + namaFile, Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            pdfDocument.close();
+            Toast.makeText(this, "Gagal menyimpan PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     // ── Helper ────────────────────────────────────────────────────────

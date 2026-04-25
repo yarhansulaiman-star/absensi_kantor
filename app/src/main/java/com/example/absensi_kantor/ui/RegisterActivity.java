@@ -80,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
                     getExternalFilesDir(Environment.DIRECTORY_PICTURES));
 
             uris[index] = FileProvider.getUriForFile(this,
-                    getPackageName() + ".provider", file);
+                    getPackageName() + ".fileprovider", file);
 
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uris[index]);

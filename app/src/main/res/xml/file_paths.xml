@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Internal storage -->
+    <files-path
+        name="internal_files"
+        path="." />
+
+    <!-- External storage biasa -->
+    <external-path
+        name="external_storage"
+        path="." />
+
+    <!-- External files dir (getExternalFilesDir) — ini yang dipakai RegisterActivity -->
+    <external-files-path
+        name="external_files"
+        path="." />
+
+    <!-- Cache -->
+    <cache-path
+        name="cache"
+        path="." />
+
+    <!-- External cache -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+</paths>

@@ -10,6 +10,8 @@ import retrofit2.http.*;
 
 public interface ApiService {
 
+    // ── SUDAH ADA (tidak diubah) ──────────────────────────────────────────
+
     @POST("login")
     Call<LoginResponse> login(@Body Map<String, String> body);
 
@@ -31,10 +33,9 @@ public interface ApiService {
 
     @GET("gaji")
     Call<GajiResponse> getGaji(
-            @Query("user_id") int userId,
-            @Query("bulan")   int bulan,
-            @Query("tahun")   int tahun,
-            @Header("Authorization") String token
+            @Query("karyawan_id") int karyawanId,
+            @Query("bulan")       int bulan,
+            @Query("tahun")       int tahun
     );
 
     @GET("karyawan/list")
@@ -42,4 +43,16 @@ public interface ApiService {
 
     @POST("gaji/set")
     Call<BaseResponse> setGaji(@Body Map<String, Object> body);
+
+    @POST("surat-izin")
+    Call<SuratIzinResponse> kirimSuratIzin(@Body Map<String, Object> body);
+
+    @GET("surat-izin")
+    Call<SuratIzinResponse> getSuratIzinSaya();
+
+    @GET("surat-izin/semua")
+    Call<SuratIzinResponse> getAllSuratIzin();
+
+    @POST("surat-izin/update-status")
+    Call<BaseResponse> updateStatusIzin(@Body Map<String, Object> body);
 }

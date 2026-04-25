@@ -40,7 +40,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lengkapi data dan ambil 3 foto wajah"
+                android:text="Lengkapi data dan ambil foto wajah"
                 android:textSize="13sp"
                 android:textColor="#BBDEFB"
                 android:layout_marginTop="4dp"/>
@@ -219,6 +219,18 @@
                     android:background="#E8EAF6"
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_camera"/>
+
+                <!-- ✅ Status Foto 1 -->
+                <TextView
+                    android:id="@+id/tvStatus1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:padding="6dp"
+                    android:gravity="center"
+                    android:visibility="gone"/>
+
                 <Button
                     android:id="@+id/btnFoto1"
                     android:layout_width="match_parent"
@@ -245,6 +257,18 @@
                     android:background="#E8EAF6"
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_camera"/>
+
+                <!-- ✅ Status Foto 2 -->
+                <TextView
+                    android:id="@+id/tvStatus2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:padding="6dp"
+                    android:gravity="center"
+                    android:visibility="gone"/>
+
                 <Button
                     android:id="@+id/btnFoto2"
                     android:layout_width="match_parent"
@@ -271,6 +295,18 @@
                     android:background="#E8EAF6"
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_camera"/>
+
+                <!-- ✅ Status Foto 3 -->
+                <TextView
+                    android:id="@+id/tvStatus3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:padding="6dp"
+                    android:gravity="center"
+                    android:visibility="gone"/>
+
                 <Button
                     android:id="@+id/btnFoto3"
                     android:layout_width="match_parent"

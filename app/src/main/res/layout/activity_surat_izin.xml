@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F2F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- CARD FORM PENGAJUAN -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ajukan Surat Izin"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A2E"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Jenis Izin -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jenis Izin"
+                    android:textSize="13sp"
+                    android:textColor="#666"/>
+
+                <Spinner
+                    android:id="@+id/spinnerJenisIzin"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_input_rounded"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"/>
+
+                <!-- Tanggal Mulai -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tanggal Mulai"
+                    android:textSize="13sp"
+                    android:textColor="#666"/>
+
+                <EditText
+                    android:id="@+id/etTanggalMulai"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Pilih tanggal"
+                    android:background="@drawable/bg_input_rounded"
+                    android:padding="12dp"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
+                    android:drawableEnd="@android:drawable/ic_menu_my_calendar"/>
+
+                <!-- Tanggal Selesai -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tanggal Selesai"
+                    android:textSize="13sp"
+                    android:textColor="#666"/>
+
+                <EditText
+                    android:id="@+id/etTanggalSelesai"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Pilih tanggal"
+                    android:background="@drawable/bg_input_rounded"
+                    android:padding="12dp"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
+                    android:drawableEnd="@android:drawable/ic_menu_my_calendar"/>
+
+                <!-- Keterangan -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Keterangan"
+                    android:textSize="13sp"
+                    android:textColor="#666"/>
+
+                <EditText
+                    android:id="@+id/etKeterangan"
+                    android:layout_width="match_parent"
+                    android:layout_height="90dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="12dp"
+                    android:hint="Jelaskan alasan izin..."
+                    android:background="@drawable/bg_input_rounded"
+                    android:padding="12dp"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine"/>
+
+                <!-- Foto Bukti -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foto Bukti (Opsional)"
+                    android:textSize="13sp"
+                    android:textColor="#666"
+                    android:layout_marginBottom="6dp"/>
+
+                <Button
+                    android:id="@+id/btnPilihFoto"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:text="📎  Pilih Foto Bukti"
+                    android:backgroundTint="#E8F5E9"
+                    android:textColor="#2E7D32"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/imgPreviewBukti"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Progress -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Kirim -->
+                <Button
+                    android:id="@+id/btnKirim"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Kirim Surat Izin"
+                    android:backgroundTint="#1565C0"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:textSize="15sp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- JUDUL RIWAYAT -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat Izin Saya"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A2E"
+            android:layout_marginBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRiwayatIzin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"/>
+
+        <!-- Label semua izin — hanya tampil untuk HRD -->
+        <TextView
+            android:id="@+id/tvLabelSemuaIzin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Semua Surat Izin Karyawan"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#1565C0"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
+
+        <!-- RecyclerView semua izin untuk HRD approve/tolak -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSemuaIzin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+</ScrollView>

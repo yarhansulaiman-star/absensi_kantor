@@ -17,8 +17,8 @@
         android:title="Laporan"/>
 
     <item
-        android:id="@+id/nav_logout"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
-        android:title="Logout"/>
+        android:id="@+id/nav_profil"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Profil"/>
 
 </menu>

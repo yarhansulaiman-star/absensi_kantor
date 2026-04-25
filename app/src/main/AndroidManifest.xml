@@ -26,8 +26,9 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Absensi_kantor">
 
+        <!-- LoginActivity sebagai halaman pertama -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,13 +36,40 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.LoginActivity" android:exported="false" />
+        <!-- MainActivity tidak lagi jadi launcher -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
         <activity android:name=".ui.RegisterActivity" android:exported="false" />
-        <activity android:name=".ui.AbsenActivity" android:exported="false" />
-        <activity android:name=".ui.GajiActivity" android:exported="false" />
-        <activity android:name=".ui.LaporanActivity" android:exported="false" />
-        <activity android:name=".ui.RiwayatActivity" android:exported="false" />
-        <activity android:name=".ui.SetGajiActivity" android:label="Input Gaji"/>
+        <activity android:name=".ui.AbsenActivity"    android:exported="false" />
+        <activity android:name=".ui.GajiActivity"     android:exported="false" />
+        <activity android:name=".ui.LaporanActivity"  android:exported="false" />
+        <activity android:name=".ui.RiwayatActivity"  android:exported="false" />
+        <activity android:name=".ui.ProfilActivity"  android:exported="false" />
+        <activity
+            android:name=".ui.SuratIzinActivity"
+            android:label="Surat Izin"/>
+
+        <activity
+            android:name=".ui.ApproveSuratIzinActivity"
+            android:label="Kelola Surat Izin"/>
+        <activity
+            android:name=".ui.SetGajiActivity"
+            android:exported="false"
+            android:label="Input Gaji" />
+
+        <!-- FileProvider untuk fix error kamera -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>

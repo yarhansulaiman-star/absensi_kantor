@@ -30,17 +30,17 @@
                     android:id="@+id/tvNamaKaryawan"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nama Karyawan"
+                    android:text="@string/label_nama_karyawan"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/tvJabatan"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Jabatan"
-                    android:textColor="#BBDEFB"
+                    android:text="@string/label_jabatan"
+                    android:textColor="#FFFFFF"
                     android:textSize="14sp"
                     android:layout_marginTop="4dp"/>
 
@@ -48,12 +48,39 @@
                     android:id="@+id/tvPeriode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Periode: -"
-                    android:textColor="#BBDEFB"
+                    android:text="@string/label_periode"
+                    android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:layout_marginTop="2dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+        <!-- ============ PILIH KARYAWAN (HRD only) ============ -->
+        <LinearLayout
+            android:id="@+id/layoutSpinnerKaryawan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pilih Karyawan"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="8dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerKaryawan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"/>
+        </LinearLayout>
 
         <!-- ============ PILIH PERIODE ============ -->
         <androidx.cardview.widget.CardView
@@ -72,7 +99,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pilih Periode"
+                    android:text="@string/label_pilih_periode"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="#333333"
@@ -88,6 +115,7 @@
                         android:id="@+id/spinnerBulan"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:minHeight="48dp"
                         android:layout_weight="2"
                         android:layout_marginEnd="8dp"/>
 
@@ -95,6 +123,7 @@
                         android:id="@+id/spinnerTahun"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:minHeight="48dp"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"/>
 
@@ -102,7 +131,7 @@
                         android:id="@+id/btnCariGaji"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cari"
+                        android:text="@string/label_cari"
                         android:backgroundTint="#1565C0"
                         android:textColor="#FFFFFF"/>
                 </LinearLayout>
@@ -133,7 +162,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Penghasilan"
+                    android:text="@string/label_penghasilan"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="#2E7D32"
@@ -149,13 +178,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Gaji Pokok"
+                        android:text="@string/label_gaji_pokok"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvGajiPokok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="@string/default_rp"
                         android:textColor="#333333"/>
                 </LinearLayout>
 
@@ -169,13 +198,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tunjangan Transport"
+                        android:text="@string/label_tunjangan_transport"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvTunjanganTransport"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="@string/default_rp"
                         android:textColor="#333333"/>
                 </LinearLayout>
 
@@ -189,13 +218,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tunjangan Makan"
+                        android:text="@string/label_tunjangan_makan"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvTunjanganMakan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="@string/default_rp"
                         android:textColor="#333333"/>
                 </LinearLayout>
 
@@ -209,13 +238,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tunjangan Jabatan"
+                        android:text="@string/label_tunjangan_jabatan"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvTunjanganJabatan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="@string/default_rp"
                         android:textColor="#333333"/>
                 </LinearLayout>
 
@@ -229,13 +258,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Uang Lembur"
+                        android:text="@string/label_uang_lembur"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvUangLembur"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="@string/default_rp"
                         android:textColor="#333333"/>
                 </LinearLayout>
 
@@ -254,14 +283,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Total Penghasilan"
+                        android:text="@string/label_total_penghasilan"
                         android:textStyle="bold"
                         android:textColor="#2E7D32"/>
                     <TextView
                         android:id="@+id/tvTotalPenghasilan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="@string/default_rp"
                         android:textStyle="bold"
                         android:textColor="#2E7D32"/>
                 </LinearLayout>
@@ -285,7 +314,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Potongan"
+                    android:text="@string/label_potongan"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="#C62828"
@@ -301,17 +330,17 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Keterlambatan"
+                        android:text="@string/label_keterlambatan"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvPotonganTerlambat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="- Rp 0"
+                        android:text="@string/default_minus_rp"
                         android:textColor="#C62828"/>
                 </LinearLayout>
 
-                <!-- Detail Terlambat — diisi programatik dari GajiActivity -->
+                <!-- Detail Terlambat -->
                 <LinearLayout
                     android:id="@+id/layoutDetailTerlambat"
                     android:layout_width="match_parent"
@@ -331,13 +360,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Alpha (tidak hadir)"
+                        android:text="@string/label_alpha"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvPotonganAlpha"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="- Rp 0"
+                        android:text="@string/default_minus_rp"
                         android:textColor="#C62828"/>
                 </LinearLayout>
 
@@ -351,13 +380,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="BPJS Kesehatan (1%)"
+                        android:text="@string/label_bpjs_kesehatan"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvBpjsKesehatan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="- Rp 0"
+                        android:text="@string/default_minus_rp"
                         android:textColor="#C62828"/>
                 </LinearLayout>
 
@@ -371,13 +400,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="BPJS Ketenagakerjaan (2%)"
+                        android:text="@string/label_bpjs_tk"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvBpjsTk"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="- Rp 0"
+                        android:text="@string/default_minus_rp"
                         android:textColor="#C62828"/>
                 </LinearLayout>
 
@@ -391,13 +420,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="PPh 21 (5%)"
+                        android:text="@string/label_pph21"
                         android:textColor="#555555"/>
                     <TextView
                         android:id="@+id/tvPph21"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="- Rp 0"
+                        android:text="@string/default_minus_rp"
                         android:textColor="#C62828"/>
                 </LinearLayout>
 
@@ -416,14 +445,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Total Potongan"
+                        android:text="@string/label_total_potongan"
                         android:textStyle="bold"
                         android:textColor="#C62828"/>
                     <TextView
                         android:id="@+id/tvTotalPotongan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="- Rp 0"
+                        android:text="@string/default_minus_rp"
                         android:textStyle="bold"
                         android:textColor="#C62828"/>
                 </LinearLayout>
@@ -449,7 +478,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="GAJI BERSIH"
+                    android:text="@string/label_gaji_bersih"
                     android:textColor="#A5D6A7"
                     android:textSize="14sp"
                     android:letterSpacing="0.1"/>
@@ -458,21 +487,20 @@
                     android:id="@+id/tvGajiBersih"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rp 0"
+                    android:text="@string/default_rp"
                     android:textColor="#FFFFFF"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
-
-            <!-- ============ TOMBOL INPUT GAJI (HRD ONLY) ============ -->
         </androidx.cardview.widget.CardView>
 
+        <!-- ============ TOMBOL ============ -->
         <Button
             android:id="@+id/btnInputGaji"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Input Data Gaji Karyawan"
+            android:text="@string/label_btn_input_gaji"
             android:backgroundTint="#1565C0"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
@@ -480,12 +508,14 @@
             android:visibility="gone"
             android:layout_marginBottom="8dp"/>
 
-        <!-- ============ TOMBOL EXPORT ============ -->
         <Button
             android:id="@+id/btnExportSlip"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="56dp"
-            android:text="Export Slip Gaji PDF"
+            android:layout_gravity="center_horizontal"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/label_btn_export_slip"
             android:backgroundTint="#6A1B9A"
             android:textColor="#FFFFFF"
             android:textSize="16sp"

@@ -82,4 +82,9 @@ dependencies {
     implementation("com.google.guava:guava:33.0.0-android")
 
     implementation("com.google.android.material:material:1.11.0")
+
+    //Machine learning kit
+    implementation ("com.google.mlkit:face-detection:16.1.5")
+
+    implementation("androidx.activity:activity:1.7.0")
 }
