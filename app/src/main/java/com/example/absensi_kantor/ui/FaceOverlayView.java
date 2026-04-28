@@ -23,6 +23,15 @@ public class FaceOverlayView extends View {
     private Paint paintGaris;
     private List<Face> faces;
 
+    // ✅ TAMBAHAN: Paint untuk label nama + keyakinan
+    private Paint paintLabelBg;
+    private Paint paintLabelText;
+
+    // ✅ TAMBAHAN: Data nama + keyakinan dari server
+    private String  recognizedName       = null;
+    private float   recognizedConfidence = 0f;
+    private boolean showRecognized       = false;
+
     private int imageWidth = 0;
     private int imageHeight = 0;
     private boolean isFrontCamera = true;
@@ -40,7 +49,7 @@ public class FaceOverlayView extends View {
         paintKotak.setColor(Color.parseColor("#00E676"));
         paintKotak.setStyle(Paint.Style.STROKE);
         paintKotak.setStrokeWidth(4f);
-        paintKotak.setAntiAlias(true); // Biar garis lebih halus
+        paintKotak.setAntiAlias(true);
 
         paintTitik = new Paint();
         paintTitik.setColor(Color.parseColor("#FF4081"));
@@ -52,6 +61,19 @@ public class FaceOverlayView extends View {
         paintGaris.setStyle(Paint.Style.STROKE);
         paintGaris.setStrokeWidth(2f);
         paintGaris.setAntiAlias(true);
+
+        // ✅ TAMBAHAN: Background label nama (hitam semi-transparan)
+        paintLabelBg = new Paint();
+        paintLabelBg.setStyle(Paint.Style.FILL);
+        paintLabelBg.setColor(Color.argb(180, 0, 0, 0));
+        paintLabelBg.setAntiAlias(true);
+
+        // ✅ TAMBAHAN: Teks label nama + keyakinan
+        paintLabelText = new Paint();
+        paintLabelText.setColor(Color.WHITE);
+        paintLabelText.setTextSize(36f);
+        paintLabelText.setFakeBoldText(true);
+        paintLabelText.setAntiAlias(true);
     }
 
     public void setFrontCamera(boolean frontCamera) {
@@ -63,11 +85,25 @@ public class FaceOverlayView extends View {
         // KameraX Portrait: rotasi 90°, tukar width & height
         this.imageWidth = imageHeight;
         this.imageHeight = imageWidth;
-        postInvalidate(); // Lebih aman untuk update UI dari background thread
+        postInvalidate();
     }
 
     public void clear() {
         this.faces = null;
+        postInvalidate();
+    }
+
+    // ✅ TAMBAHAN: Dipanggil dari AbsenActivity setelah server mengenali wajah
+    public void showRecognitionResult(String nama, float confidence) {
+        this.recognizedName       = nama;
+        this.recognizedConfidence = confidence;
+        this.showRecognized       = true;
+        postInvalidate();
+    }
+
+    // ✅ TAMBAHAN: Dipanggil saat mulai scan baru agar label lama hilang
+    public void hideRecognitionResult() {
+        this.showRecognized = false;
         postInvalidate();
     }
 
@@ -99,7 +135,7 @@ public class FaceOverlayView extends View {
         Face face = ambilWajahTerbesar(faces);
         if (face == null) return;
 
-        // ── Kotak wajah ──
+        // ── Kotak wajah ── (tidak diubah)
         Rect bounds = face.getBoundingBox();
         if (isFrontCamera) {
             rectWajah.left = viewW - (bounds.right * scaleX);
@@ -113,7 +149,7 @@ public class FaceOverlayView extends View {
 
         canvas.drawRect(rectWajah, paintKotak);
 
-        // ── Titik landmark ──
+        // ── Titik landmark ── (tidak diubah)
         int[] landmarks = {
                 FaceLandmark.LEFT_EYE, FaceLandmark.RIGHT_EYE, FaceLandmark.NOSE_BASE,
                 FaceLandmark.MOUTH_LEFT, FaceLandmark.MOUTH_RIGHT, FaceLandmark.MOUTH_BOTTOM,
@@ -124,10 +160,37 @@ public class FaceOverlayView extends View {
             gambarTitik(canvas, face, type, scaleX, scaleY, viewW);
         }
 
-        // ── Garis ──
+        // ── Garis ── (tidak diubah)
         gambarGarisAntara(canvas, face, FaceLandmark.LEFT_EYE, FaceLandmark.NOSE_BASE, scaleX, scaleY, viewW);
         gambarGarisAntara(canvas, face, FaceLandmark.RIGHT_EYE, FaceLandmark.NOSE_BASE, scaleX, scaleY, viewW);
         gambarGarisAntara(canvas, face, FaceLandmark.MOUTH_LEFT, FaceLandmark.MOUTH_RIGHT, scaleX, scaleY, viewW);
+
+        // ✅ TAMBAHAN: Label nama + keyakinan di atas kotak wajah
+        if (showRecognized && recognizedName != null) {
+            String label = recognizedName + "  " + String.format("%.1f", recognizedConfidence) + "%";
+
+            float textW   = paintLabelText.measureText(label);
+            float padding = 12f;
+            float bgLeft   = rectWajah.left;
+            float bgRight  = rectWajah.left + textW + padding * 2;
+            float bgBottom = rectWajah.top;         // tepat di atas kotak
+            float bgTop    = bgBottom - 52f;
+
+            // Jangan sampai keluar layar atas
+            if (bgTop < 0) {
+                bgTop    = rectWajah.bottom;
+                bgBottom = rectWajah.bottom + 52f;
+            }
+
+            // Background pill
+            canvas.drawRoundRect(
+                    new RectF(bgLeft, bgTop, bgRight, bgBottom),
+                    12f, 12f,
+                    paintLabelBg);
+
+            // Teks
+            canvas.drawText(label, bgLeft + padding, bgBottom - 12f, paintLabelText);
+        }
     }
 
     private float mirrorX(float x, float scaleX, float viewW) {

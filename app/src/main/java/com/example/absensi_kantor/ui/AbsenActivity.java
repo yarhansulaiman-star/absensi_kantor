@@ -15,6 +15,7 @@ import android.graphics.Rect;
 import android.location.Location;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.databinding.ActivityAbsenBinding;
 import com.example.absensi_kantor.model.AbsenResponse;
 import com.example.absensi_kantor.utils.ImageUtils;
+import com.example.absensi_kantor.utils.NotificationHelper;
 import com.google.android.gms.location.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
@@ -38,16 +40,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AbsenActivity extends AppCompatActivity {
 
-    private static final String TAG             = "AbsenActivity";
-    private static final int CAMERA_PERMISSION   = 100;
-    private static final int LOCATION_PERMISSION = 101;
+    private static final String TAG              = "AbsenActivity";
+    private static final int    CAMERA_PERMISSION   = 100;
+    private static final int    LOCATION_PERMISSION = 101;
+
+    private static final long RECOGNITION_INTERVAL_MS = 2000;
 
     private ActivityAbsenBinding        binding;
     private SessionManager              session;
@@ -56,7 +64,6 @@ public class AbsenActivity extends AppCompatActivity {
     private ExecutorService             executor;
     private boolean                     pakaiKameraDepan = false;
 
-    // ✅ Overlay titik wajah
     private FaceOverlayView faceOverlay;
 
     private FusedLocationProviderClient fusedLocation;
@@ -64,6 +71,10 @@ public class AbsenActivity extends AppCompatActivity {
     private Double currentLon = null;
 
     private FaceDetector faceDetector;
+
+    private final Handler       recognitionHandler = new Handler(Looper.getMainLooper());
+    private final AtomicBoolean isRecognizing      = new AtomicBoolean(false);
+    private       Runnable      recognitionRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +88,6 @@ public class AbsenActivity extends AppCompatActivity {
 
         fusedLocation = LocationServices.getFusedLocationProviderClient(this);
 
-        // ✅ Inisialisasi ML Kit Face Detector
         FaceDetectorOptions options = new FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
                 .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
@@ -85,7 +95,6 @@ public class AbsenActivity extends AppCompatActivity {
                 .build();
         faceDetector = FaceDetection.getClient(options);
 
-        // ✅ Init overlay
         faceOverlay = binding.faceOverlay;
 
         Log.d(TAG, "Token: " + session.getToken());
@@ -169,12 +178,10 @@ public class AbsenActivity extends AppCompatActivity {
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .build();
 
-                // ✅ ImageAnalysis untuk real-time deteksi wajah
                 imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
 
-                // ✅ FIX: Gunakan anonymous class agar @ExperimentalGetImage bisa diterapkan
                 imageAnalysis.setAnalyzer(executor, new ImageAnalysis.Analyzer() {
                     @Override
                     @androidx.camera.core.ExperimentalGetImage
@@ -184,12 +191,12 @@ public class AbsenActivity extends AppCompatActivity {
                 });
 
                 CameraSelector selector = pilihKamera(provider);
-                // ✅ Beritahu overlay apakah pakai kamera depan (untuk mirror X)
                 faceOverlay.setFrontCamera(pakaiKameraDepan);
                 provider.unbindAll();
-                // ✅ Tambah imageAnalysis ke lifecycle
                 provider.bindToLifecycle(this, selector,
                         preview, imageCapture, imageAnalysis);
+
+                mulaiRealtimeRecognition();
 
             } catch (Exception e) {
                 runOnUiThread(() ->
@@ -221,7 +228,7 @@ public class AbsenActivity extends AppCompatActivity {
         return new CameraSelector.Builder().build();
     }
 
-    // ── Real-time Deteksi Wajah ───────────────────────────────────────────────
+    // ── Real-time Deteksi Wajah ──────────────────────────────────────────────
 
     @androidx.camera.core.ExperimentalGetImage
     private void deteksiWajahRealtime(ImageProxy imageProxy) {
@@ -242,6 +249,82 @@ public class AbsenActivity extends AppCompatActivity {
                         faceOverlay.setFaces(faces, imgW, imgH))
                 .addOnFailureListener(e -> faceOverlay.clear())
                 .addOnCompleteListener(task -> imageProxy.close());
+    }
+
+    // ── Real-time Recognition ────────────────────────────────────────────────
+
+    private void mulaiRealtimeRecognition() {
+        recognitionRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (imageCapture != null && !isRecognizing.get()) {
+                    ambilFotoUntukRecognition();
+                }
+                recognitionHandler.postDelayed(this, RECOGNITION_INTERVAL_MS);
+            }
+        };
+        recognitionHandler.postDelayed(recognitionRunnable, RECOGNITION_INTERVAL_MS);
+    }
+
+    private void ambilFotoUntukRecognition() {
+        isRecognizing.set(true);
+
+        File fotoFile = new File(getCacheDir(), "recognition_foto.jpg");
+        ImageCapture.OutputFileOptions options =
+                new ImageCapture.OutputFileOptions.Builder(fotoFile).build();
+
+        imageCapture.takePicture(options, executor,
+                new ImageCapture.OnImageSavedCallback() {
+                    @Override
+                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults output) {
+                        Bitmap bitmap = BitmapFactory.decodeFile(fotoFile.getAbsolutePath());
+                        if (bitmap == null) {
+                            isRecognizing.set(false);
+                            return;
+                        }
+                        Bitmap fixed = ImageUtils.fixBitmap(bitmap, pakaiKameraDepan);
+                        kirimUntukRecognition(fixed);
+                    }
+
+                    @Override
+                    public void onError(@NonNull ImageCaptureException e) {
+                        isRecognizing.set(false);
+                        Log.e(TAG, "Recognition foto error: " + e.getMessage());
+                    }
+                });
+    }
+
+    private void kirimUntukRecognition(Bitmap bitmap) {
+        String base64 = ImageUtils.bitmapToBase64(bitmap);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("gambar", base64);
+
+        ApiClient.getService().kenali(body)
+                .enqueue(new Callback<AbsenResponse>() {
+                    @Override
+                    public void onResponse(Call<AbsenResponse> call,
+                                           Response<AbsenResponse> response) {
+                        isRecognizing.set(false);
+                        if (!response.isSuccessful() || response.body() == null) return;
+
+                        AbsenResponse hasil = response.body();
+                        runOnUiThread(() -> {
+                            if (hasil.sukses && hasil.nama != null && hasil.keyakinan > 0) {
+                                faceOverlay.showRecognitionResult(
+                                        hasil.nama, (float) hasil.keyakinan);
+                            } else {
+                                faceOverlay.hideRecognitionResult();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Call<AbsenResponse> call, Throwable t) {
+                        isRecognizing.set(false);
+                        Log.e(TAG, "Recognition gagal: " + t.getMessage());
+                    }
+                });
     }
 
     // ── Foto & Absen ─────────────────────────────────────────────────────────
@@ -273,10 +356,8 @@ public class AbsenActivity extends AppCompatActivity {
                         }
 
                         Bitmap fixed = ImageUtils.fixBitmap(bitmap, pakaiKameraDepan);
-
                         Log.d(TAG, "Foto processed, size: "
                                 + fixed.getWidth() + "x" + fixed.getHeight());
-
                         deteksiWajahLaluKirim(fixed);
                     }
 
@@ -290,7 +371,7 @@ public class AbsenActivity extends AppCompatActivity {
                 });
     }
 
-    // ── ML Kit: Deteksi Wajah sebelum kirim ──────────────────────────────────
+    // ── ML Kit: Deteksi Wajah ────────────────────────────────────────────────
 
     private void deteksiWajahLaluKirim(Bitmap bitmap) {
         runOnUiThread(() -> setStatus("🔍 Mendeteksi wajah..."));
@@ -311,11 +392,8 @@ public class AbsenActivity extends AppCompatActivity {
                     Face face = faces.get(0);
 
                     Rect bounds = face.getBoundingBox();
-                    int x = bounds.left;
-                    int y = bounds.top;
-                    int w = bounds.width();
-                    int h = bounds.height();
-                    Log.d(TAG, "Wajah → x=" + x + ", y=" + y + ", w=" + w + ", h=" + h);
+                    Log.d(TAG, "Wajah → x=" + bounds.left + ", y=" + bounds.top
+                            + ", w=" + bounds.width() + ", h=" + bounds.height());
 
                     Float leftEye  = face.getLeftEyeOpenProbability();
                     Float rightEye = face.getRightEyeOpenProbability();
@@ -402,6 +480,14 @@ public class AbsenActivity extends AppCompatActivity {
 
                             if (hasil.sukses) {
                                 tampilkanHasil(hasil);
+
+                                //  Tampilkan notifikasi absen berhasil
+                                String waktuSekarang = new SimpleDateFormat("HH:mm", Locale.getDefault())
+                                        .format(new Date());
+                                String jenisAbsen = "keluar".equals(hasil.tipe) ? "Pulang" : "Masuk";
+                                NotificationHelper.tampilkanAbsenBerhasil(
+                                        AbsenActivity.this, jenisAbsen, waktuSekarang);
+
                             } else {
                                 setStatus("⚠️ " + hasil.pesan);
                             }
@@ -497,8 +583,24 @@ public class AbsenActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (recognitionRunnable != null)
+            recognitionHandler.removeCallbacks(recognitionRunnable);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (recognitionRunnable != null)
+            recognitionHandler.postDelayed(recognitionRunnable, RECOGNITION_INTERVAL_MS);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (recognitionRunnable != null)
+            recognitionHandler.removeCallbacks(recognitionRunnable);
         executor.shutdown();
         faceDetector.close();
     }

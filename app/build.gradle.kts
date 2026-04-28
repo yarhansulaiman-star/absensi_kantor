@@ -2,9 +2,10 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
-// Baca local.properties
+
 val localProps = Properties()
 val localPropsFile = rootProject.file("local.properties")
 if (localPropsFile.exists()) {
@@ -45,7 +46,7 @@ android {
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true  // ← wajib ditambah agar BuildConfig aktif
+        buildConfig = true  //
     }
 }
 
@@ -87,4 +88,12 @@ dependencies {
     implementation ("com.google.mlkit:face-detection:16.1.5")
 
     implementation("androidx.activity:activity:1.7.0")
+
+    implementation("org.osmdroid:osmdroid-android:6.1.17")
+
+    // FCM
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
+
+    implementation("androidx.core:core:1.12.0")
+
 }

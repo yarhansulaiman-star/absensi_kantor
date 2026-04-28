@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -9,8 +8,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    <!-- Fix error: camera permission tanpa uses-feature -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -26,7 +27,8 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Absensi_kantor">
 
-        <!-- LoginActivity sebagai halaman pertama -->
+        <!-- ===================== ACTIVITIES ===================== -->
+
         <activity
             android:name=".ui.LoginActivity"
             android:exported="true">
@@ -36,30 +38,48 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity tidak lagi jadi launcher -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-
-        <activity android:name=".ui.RegisterActivity" android:exported="false" />
-        <activity android:name=".ui.AbsenActivity"    android:exported="false" />
-        <activity android:name=".ui.GajiActivity"     android:exported="false" />
-        <activity android:name=".ui.LaporanActivity"  android:exported="false" />
-        <activity android:name=".ui.RiwayatActivity"  android:exported="false" />
-        <activity android:name=".ui.ProfilActivity"  android:exported="false" />
-        <activity
-            android:name=".ui.SuratIzinActivity"
-            android:label="Surat Izin"/>
-
-        <activity
-            android:name=".ui.ApproveSuratIzinActivity"
-            android:label="Kelola Surat Izin"/>
+        <activity android:name=".MainActivity"                  android:exported="false" />
+        <activity android:name=".ui.RegisterActivity"           android:exported="false" />
+        <activity android:name=".ui.AbsenActivity"              android:exported="false" />
+        <activity android:name=".ui.GajiActivity"               android:exported="false" />
+        <activity android:name=".ui.LaporanActivity"            android:exported="false" />
+        <activity android:name=".ui.RiwayatActivity"            android:exported="false" />
+        <activity android:name=".ui.ProfilActivity"             android:exported="false" />
+        <activity android:name=".ui.SuratIzinActivity"          android:label="Surat Izin" />
+        <activity android:name=".ui.ApproveSuratIzinActivity"   android:label="Kelola Surat Izin" />
         <activity
             android:name=".ui.SetGajiActivity"
             android:exported="false"
             android:label="Input Gaji" />
 
-        <!-- FileProvider untuk fix error kamera -->
+        <!-- ===================== NOTIFIKASI ===================== -->
+
+        <!-- FCM Service -->
+        <service
+            android:name=".utils.MyfirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".utils.AbsenReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.absensi_kantor.ACTION_ABSEN_MASUK" />
+                <action android:name="com.example.absensi_kantor.ACTION_ABSEN_PULANG" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".utils.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

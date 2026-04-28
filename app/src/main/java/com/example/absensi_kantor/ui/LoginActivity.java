@@ -7,12 +7,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-
 import com.example.absensi_kantor.MainActivity;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.databinding.ActivityLoginBinding;
 import com.example.absensi_kantor.model.LoginResponse;
+import com.example.absensi_kantor.utils.AlarmScheduler;
+import com.example.absensi_kantor.utils.NotificationHelper;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,8 +35,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         ApiClient.init(this);
-
         session = new SessionManager(this);
+        NotificationHelper.createNotificationChannels(this);
 
         if (session.isLoggedIn()) {
             bukaMainActivity();
@@ -87,11 +89,8 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(TAG, "sukses=" + res.sukses + ", role=" + res.role);
 
                     if (res.sukses) {
-                        // Simpan session lengkap termasuk userId
                         session.simpanSession(res.token, res.username, res.role, res.userId);
 
-                        // Simpan komponen gaji jika sudah ada di response login
-                        // (opsional — hapus blok ini jika backend belum return data gaji saat login)
                         if (res.gajiPokok > 0) {
                             session.simpanDataGaji(
                                     (long) res.gajiPokok,
@@ -103,7 +102,13 @@ public class LoginActivity extends AppCompatActivity {
                             );
                         }
 
-                        bukaMainActivity();
+                        // Jadwalkan alarm absen
+                        AlarmScheduler.jadwalkanPengingatAbsen(LoginActivity.this);
+
+                        // Ambil FCM Token lalu buka MainActivity di dalamnya
+                        ambilFcmToken();
+
+
                     } else {
                         tampilkanError(res.pesan != null ? res.pesan
                                 : "Username atau password salah!");
@@ -127,6 +132,40 @@ public class LoginActivity extends AppCompatActivity {
                         "Gagal konek ke server!", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void ambilFcmToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String fcmToken = task.getResult();
+
+                        getSharedPreferences("fcm_pref", MODE_PRIVATE)
+                                .edit()
+                                .putString("fcm_token", fcmToken)
+                                .apply();
+
+                        Map<String, String> body = new HashMap<>();
+                        body.put("fcm_token", fcmToken);
+
+                        ApiClient.getService()
+                                .simpanFcmToken("Bearer " + session.getToken(), body)
+                                .enqueue(new Callback<Void>() {
+                                    @Override
+                                    public void onResponse(Call<Void> call, Response<Void> response) {
+                                        Log.d(TAG, "FCM token terkirim: " + response.code());
+                                        bukaMainActivity(); // ✅ di sini
+                                    }
+                                    @Override
+                                    public void onFailure(Call<Void> call, Throwable t) {
+                                        Log.e(TAG, "Gagal: " + t.getMessage());
+                                        bukaMainActivity(); // ✅ di sini
+                                    }
+                                });
+                    } else {
+                        bukaMainActivity(); // ✅ di sini
+                    }
+                });
     }
 
     private void tampilkanError(String pesan) {

@@ -10,7 +10,6 @@ import retrofit2.http.*;
 
 public interface ApiService {
 
-    // ── SUDAH ADA (tidak diubah) ──────────────────────────────────────────
 
     @POST("login")
     Call<LoginResponse> login(@Body Map<String, String> body);
@@ -55,4 +54,13 @@ public interface ApiService {
 
     @POST("surat-izin/update-status")
     Call<BaseResponse> updateStatusIzin(@Body Map<String, Object> body);
+
+    @POST("kenali")
+    Call<AbsenResponse> kenali(@Body Map<String, Object> body);
+
+    @POST("simpan-fcm-token")
+    Call<Void> simpanFcmToken(
+            @Header("Authorization") String token,
+            @Body Map<String, String> body
+    );
 }
