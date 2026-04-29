@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import com.example.absensi_kantor.utils.receiver.AbsenReceiver;
+
 import java.util.Calendar;
 
 public class AlarmScheduler {

@@ -11,8 +11,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.absensi_kantor.R;
-import com.example.absensi_kantor.ui.AbsenActivity;
-import com.example.absensi_kantor.ui.SuratIzinActivity;
+import com.example.absensi_kantor.ui.absen.AbsenActivity;
+import com.example.absensi_kantor.ui.izin.SuratIzinActivity;
 
 public class NotificationHelper {
 

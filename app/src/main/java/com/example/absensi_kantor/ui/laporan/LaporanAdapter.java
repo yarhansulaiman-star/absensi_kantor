@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.laporan;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.absensi_kantor.R;
-import com.example.absensi_kantor.model.LaporanResponse;
+import com.example.absensi_kantor.model.laporan.LaporanResponse;
 import java.util.List;
 
 public class LaporanAdapter extends RecyclerView.Adapter<LaporanAdapter.ViewHolder> {

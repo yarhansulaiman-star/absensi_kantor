@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.absen;
 
 import android.content.Context;
 import android.graphics.Canvas;

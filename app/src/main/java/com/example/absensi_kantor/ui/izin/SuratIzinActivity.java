@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.izin;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -21,7 +21,8 @@ import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.model.BaseResponse;
-import com.example.absensi_kantor.model.SuratIzinResponse;
+import com.example.absensi_kantor.model.izin.SuratIzinResponse;
+import com.example.absensi_kantor.ui.izin.adapter.SuratIzinAdapter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

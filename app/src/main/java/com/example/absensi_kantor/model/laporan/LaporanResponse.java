@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.model;
+package com.example.absensi_kantor.model.laporan;
 
 import com.example.absensi_kantor.model.BaseResponse;
 

@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.model;
+package com.example.absensi_kantor.model.absen;
 
 import com.google.gson.annotations.SerializedName;
 

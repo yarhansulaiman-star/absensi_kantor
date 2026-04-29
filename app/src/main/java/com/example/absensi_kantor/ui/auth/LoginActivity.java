@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
@@ -7,11 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.absensi_kantor.MainActivity;
+import com.example.absensi_kantor.ui.MainActivity;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.databinding.ActivityLoginBinding;
-import com.example.absensi_kantor.model.LoginResponse;
+import com.example.absensi_kantor.model.auth.LoginResponse;
 import com.example.absensi_kantor.utils.AlarmScheduler;
 import com.example.absensi_kantor.utils.NotificationHelper;
 import com.google.firebase.messaging.FirebaseMessaging;

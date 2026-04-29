@@ -52,7 +52,7 @@
             android:layout_height="match_parent" />
 
         <!-- ✅ Overlay titik wajah ML Kit -->
-        <com.example.absensi_kantor.ui.FaceOverlayView
+        <com.example.absensi_kantor.ui.absen.FaceOverlayView
             android:id="@+id/faceOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

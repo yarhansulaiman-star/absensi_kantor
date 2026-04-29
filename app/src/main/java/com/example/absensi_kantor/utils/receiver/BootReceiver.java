@@ -1,10 +1,11 @@
-package com.example.absensi_kantor.utils;
+package com.example.absensi_kantor.utils.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
 import com.example.absensi_kantor.api.SessionManager;
+import com.example.absensi_kantor.utils.AlarmScheduler;
 
 public class BootReceiver extends BroadcastReceiver {
 

@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.absen;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.databinding.ActivityAbsenBinding;
-import com.example.absensi_kantor.model.AbsenResponse;
+import com.example.absensi_kantor.model.absen.AbsenResponse;
 import com.example.absensi_kantor.utils.ImageUtils;
 import com.example.absensi_kantor.utils.NotificationHelper;
 import com.google.android.gms.location.*;
@@ -51,11 +51,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AbsenActivity extends AppCompatActivity {
 
-    private static final String TAG              = "AbsenActivity";
-    private static final int    CAMERA_PERMISSION   = 100;
+    private static final String TAG               = "AbsenActivity";
+    private static final int    CAMERA_PERMISSION  = 100;
     private static final int    LOCATION_PERMISSION = 101;
 
-    private static final long RECOGNITION_INTERVAL_MS = 2000;
+    private static final long  RECOGNITION_INTERVAL_MS = 2000;
+
+    // ✅ FIX: Threshold keyakinan minimum di sisi Android
+    // Real-time preview: 65% (lebih longgar, hanya tampilan)
+    // Absen sungguhan: 75% (ketat, untuk keamanan)
+    private static final float MIN_CONFIDENCE_PREVIEW = 65f;
+    private static final float MIN_CONFIDENCE_ABSEN   = 75f;
 
     private ActivityAbsenBinding        binding;
     private SessionManager              session;
@@ -310,10 +316,14 @@ public class AbsenActivity extends AppCompatActivity {
 
                         AbsenResponse hasil = response.body();
                         runOnUiThread(() -> {
-                            if (hasil.sukses && hasil.nama != null && hasil.keyakinan > 0) {
+                            // ✅ FIX: Filter keyakinan minimum untuk preview
+                            if (hasil.sukses
+                                    && hasil.nama != null
+                                    && hasil.keyakinan >= MIN_CONFIDENCE_PREVIEW) {
                                 faceOverlay.showRecognitionResult(
                                         hasil.nama, (float) hasil.keyakinan);
                             } else {
+                                // Keyakinan rendah → jangan tampilkan nama siapapun
                                 faceOverlay.hideRecognitionResult();
                             }
                         });
@@ -479,11 +489,19 @@ public class AbsenActivity extends AppCompatActivity {
                             }
 
                             if (hasil.sukses) {
+                                // ✅ FIX: Double-check keyakinan di sisi Android
+                                // Meski server sudah filter, Android ikut validasi
+                                if (hasil.keyakinan < MIN_CONFIDENCE_ABSEN) {
+                                    setStatus("⚠️ Wajah tidak dikenali dengan pasti.\n"
+                                            + "Keyakinan: " + String.format("%.1f", hasil.keyakinan) + "%\n"
+                                            + "Coba lagi dengan pencahayaan lebih baik.");
+                                    return;
+                                }
+
                                 tampilkanHasil(hasil);
 
-                                //  Tampilkan notifikasi absen berhasil
-                                String waktuSekarang = new SimpleDateFormat("HH:mm", Locale.getDefault())
-                                        .format(new Date());
+                                String waktuSekarang = new SimpleDateFormat(
+                                        "HH:mm", Locale.getDefault()).format(new Date());
                                 String jenisAbsen = "keluar".equals(hasil.tipe) ? "Pulang" : "Masuk";
                                 NotificationHelper.tampilkanAbsenBerhasil(
                                         AbsenActivity.this, jenisAbsen, waktuSekarang);

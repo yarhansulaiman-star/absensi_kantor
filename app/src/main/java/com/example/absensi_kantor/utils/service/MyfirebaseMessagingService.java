@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.utils;
+package com.example.absensi_kantor.utils.service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -12,13 +12,22 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.example.absensi_kantor.R;
-import com.example.absensi_kantor.ui.AbsenActivity;
+import com.example.absensi_kantor.api.ApiClient;
+import com.example.absensi_kantor.api.SessionManager;
+import com.example.absensi_kantor.ui.absen.AbsenActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MyfirebaseMessagingService extends FirebaseMessagingService {
 
-    private static final String TAG = "FCMService";
+    private static final String TAG        = "FCMService";
     private static final String CHANNEL_ID = "absen_channel";
     private static final String CHANNEL_NAME = "Notifikasi Absen";
 
@@ -27,20 +36,18 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Pesan diterima dari: " + remoteMessage.getFrom());
 
         String title = "Absensi Kantor";
-        String body = "";
+        String body  = "";
 
-        // Dari notification payload
         if (remoteMessage.getNotification() != null) {
             title = remoteMessage.getNotification().getTitle();
-            body = remoteMessage.getNotification().getBody();
+            body  = remoteMessage.getNotification().getBody();
         }
 
-        // Dari data payload (override jika ada)
         if (remoteMessage.getData().size() > 0) {
             if (remoteMessage.getData().containsKey("title"))
                 title = remoteMessage.getData().get("title");
             if (remoteMessage.getData().containsKey("body"))
-                body = remoteMessage.getData().get("body");
+                body  = remoteMessage.getData().get("body");
         }
 
         tampilkanNotifikasi(title, body);
@@ -56,7 +63,40 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
                 .putString("fcm_token", token)
                 .apply();
 
-        // TODO: kirim token ke server backend
+        // Kirim token ke server
+        kirimTokenKeServer(token);
+    }
+
+    private void kirimTokenKeServer(String fcmToken) {
+        try {
+            ApiClient.init(this);
+            SessionManager session = new SessionManager(this);
+            String savedToken = session.getToken();
+
+            if (savedToken == null || savedToken.isEmpty()) {
+                Log.d(TAG, "Belum login, token FCM disimpan lokal saja");
+                return;
+            }
+
+            Map<String, String> body = new HashMap<>();
+            body.put("fcm_token", fcmToken);
+
+            ApiClient.getService()
+                    .simpanFcmToken("Bearer " + savedToken, body)
+                    .enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            Log.d(TAG, "✅ Token FCM berhasil dikirim ke server");
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Log.e(TAG, "❌ Gagal kirim token FCM: " + t.getMessage());
+                        }
+                    });
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error kirim token: " + e.getMessage());
+        }
     }
 
     private void tampilkanNotifikasi(String title, String body) {
@@ -71,7 +111,6 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager manager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Wajib untuk Android 8+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
@@ -82,13 +121,14 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
             manager.createNotificationChannel(channel);
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pendingIntent);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setContentTitle(title)
+                        .setContentText(body)
+                        .setAutoCancel(true)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setContentIntent(pendingIntent);
 
         manager.notify((int) System.currentTimeMillis(), builder.build());
     }

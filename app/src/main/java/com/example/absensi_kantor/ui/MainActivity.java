@@ -1,4 +1,4 @@
-package com.example.absensi_kantor;
+package com.example.absensi_kantor.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
@@ -7,16 +7,16 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.databinding.ActivityMainBinding;
-import com.example.absensi_kantor.ui.AbsenActivity;
-import com.example.absensi_kantor.ui.GajiActivity;
-import com.example.absensi_kantor.ui.LaporanActivity;
-import com.example.absensi_kantor.ui.LoginActivity;
-import com.example.absensi_kantor.ui.ProfilActivity;
-import com.example.absensi_kantor.ui.RiwayatActivity;
-import com.example.absensi_kantor.ui.SuratIzinActivity;
+import com.example.absensi_kantor.ui.absen.AbsenActivity;
+import com.example.absensi_kantor.ui.gaji.GajiActivity;
+import com.example.absensi_kantor.ui.laporan.LaporanActivity;
+import com.example.absensi_kantor.ui.auth.ProfilActivity;
+import com.example.absensi_kantor.ui.laporan.RiwayatActivity;
+import com.example.absensi_kantor.ui.izin.SuratIzinActivity;
 import com.example.absensi_kantor.utils.DateUtils;
 
 import java.io.File;

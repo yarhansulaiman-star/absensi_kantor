@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.laporan;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
-import com.example.absensi_kantor.model.RiwayatResponse;
+import com.example.absensi_kantor.model.absen.RiwayatResponse;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;

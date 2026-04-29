@@ -1,6 +1,14 @@
 package com.example.absensi_kantor.api;
 
 import com.example.absensi_kantor.model.*;
+import com.example.absensi_kantor.model.absen.AbsenResponse;
+import com.example.absensi_kantor.model.absen.RiwayatResponse;
+import com.example.absensi_kantor.model.auth.LoginResponse;
+import com.example.absensi_kantor.model.auth.RegisterResponse;
+import com.example.absensi_kantor.model.gaji.GajiResponse;
+import com.example.absensi_kantor.model.izin.SuratIzinResponse;
+import com.example.absensi_kantor.model.laporan.KaryawanListResponse;
+import com.example.absensi_kantor.model.laporan.LaporanResponse;
 
 import java.util.Map;
 
@@ -30,13 +38,13 @@ public interface ApiService {
     @Streaming
     Call<ResponseBody> laporanPdf(@Query("tanggal") String tanggal);
 
+
     @GET("gaji")
     Call<GajiResponse> getGaji(
-            @Query("karyawan_id") int karyawanId,
-            @Query("bulan")       int bulan,
-            @Query("tahun")       int tahun
+            @Query("karyawan_id") Integer karyawanId,
+            @Query("bulan") int bulan,
+            @Query("tahun") int tahun
     );
-
     @GET("karyawan/list")
     Call<KaryawanListResponse> getKaryawanList();
 

@@ -7,19 +7,18 @@ import java.io.ByteArrayOutputStream;
 
 public class ImageUtils {
 
-    private static final int JPEG_QUALITY = 90;
+    // 640px cukup untuk face_recognition — dlib hanya butuh wajah ~150px
+    // Quality 70 → ~30–60 KB per foto vs 300–500 KB sebelumnya (1280px, q90)
+    private static final int MAX_SIZE     = 640;
+    private static final int JPEG_QUALITY = 70;
 
     public static Bitmap resizeBitmap(Bitmap bitmap, int maxW, int maxH) {
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
-
         if (w <= maxW && h <= maxH) return bitmap;
-
         float scale = Math.min((float) maxW / w, (float) maxH / h);
-        int newW = Math.round(w * scale);
-        int newH = Math.round(h * scale);
-
-        return Bitmap.createScaledBitmap(bitmap, newW, newH, true);
+        return Bitmap.createScaledBitmap(bitmap,
+                Math.round(w * scale), Math.round(h * scale), true);
     }
 
     public static Bitmap flipHorizontal(Bitmap bitmap) {
@@ -39,13 +38,14 @@ public class ImageUtils {
                     result.getWidth(), result.getHeight(), matrix, true);
         }
 
-        result = resizeBitmap(result, 1280, 1280); // ← naikan dari 1000 ke 1280
-
+        // Turun dari 1280 ke 640 — ini kunci utama pengurangan timeout
+        result = resizeBitmap(result, MAX_SIZE, MAX_SIZE);
         return result;
     }
 
     public static String bitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // Turun dari quality 90 ke 70
         bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, baos);
         return Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
     }

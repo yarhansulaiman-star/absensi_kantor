@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.izin;
 
 import android.os.Bundle;
 import android.view.View;
@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.model.BaseResponse;
-import com.example.absensi_kantor.model.SuratIzinResponse;
+import com.example.absensi_kantor.model.izin.SuratIzinResponse;
+import com.example.absensi_kantor.ui.izin.adapter.SuratIzinAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

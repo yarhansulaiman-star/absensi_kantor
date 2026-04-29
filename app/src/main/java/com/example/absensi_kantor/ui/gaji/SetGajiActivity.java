@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.gaji;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +9,7 @@ import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.model.BaseResponse;
-import com.example.absensi_kantor.model.KaryawanListResponse;
+import com.example.absensi_kantor.model.laporan.KaryawanListResponse;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -89,7 +89,7 @@ public class SetGajiActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, tahunList);
         spinnerTahun.setAdapter(adapter);
-        spinnerTahun.setSelection(0); // default tahun sekarang
+        spinnerTahun.setSelection(0);
     }
 
     private void loadKaryawan() {
@@ -132,31 +132,53 @@ public class SetGajiActivity extends AppCompatActivity {
             return;
         }
 
-        String strGajiPokok   = etGajiPokok.getText().toString().trim();
-        String strTransport   = etTunjanganTransport.getText().toString().trim();
-        String strMakan       = etTunjanganMakan.getText().toString().trim();
-        String strJabatan     = etTunjanganJabatan.getText().toString().trim();
+        String strGajiPokok = etGajiPokok.getText().toString().trim();
+        String strTransport  = etTunjanganTransport.getText().toString().trim();
+        String strMakan      = etTunjanganMakan.getText().toString().trim();
+        String strJabatan    = etTunjanganJabatan.getText().toString().trim();
 
+        // ── Validasi input ──────────────────────────────────────────
         if (strGajiPokok.isEmpty()) {
             etGajiPokok.setError("Gaji pokok wajib diisi");
             etGajiPokok.requestFocus();
             return;
         }
 
-        int selectedIdx  = spinnerKaryawan.getSelectedItemPosition();
-        int karyawanId   = karyawanList.get(selectedIdx).id;
-        int bulan        = spinnerBulan.getSelectedItemPosition() + 1;
-        int tahun        = Integer.parseInt(spinnerTahun.getSelectedItem().toString());
+        long gajiPokok;
+        try {
+            gajiPokok = Long.parseLong(strGajiPokok);
+            if (gajiPokok <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            etGajiPokok.setError("Masukkan angka yang valid");
+            etGajiPokok.requestFocus();
+            return;
+        }
+
+        long transport = 0, makan = 0, jabatan = 0;
+        try {
+            if (!strTransport.isEmpty()) transport = Long.parseLong(strTransport);
+            if (!strMakan.isEmpty())     makan     = Long.parseLong(strMakan);
+            if (!strJabatan.isEmpty())   jabatan   = Long.parseLong(strJabatan);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Input tunjangan tidak valid", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // ────────────────────────────────────────────────────────────
+
+        int selectedIdx = spinnerKaryawan.getSelectedItemPosition();
+        int karyawanId  = karyawanList.get(selectedIdx).id;
+        int bulan       = spinnerBulan.getSelectedItemPosition() + 1;
+        int tahun       = Integer.parseInt(spinnerTahun.getSelectedItem().toString());
 
         progressBar.setVisibility(View.VISIBLE);
         btnSimpanGaji.setEnabled(false);
 
         Map<String, Object> body = new HashMap<>();
         body.put("karyawan_id",         karyawanId);
-        body.put("gaji_pokok",          Long.parseLong(strGajiPokok));
-        body.put("tunjangan_transport", strTransport.isEmpty() ? 0 : Long.parseLong(strTransport));
-        body.put("tunjangan_makan",     strMakan.isEmpty()     ? 0 : Long.parseLong(strMakan));
-        body.put("tunjangan_jabatan",   strJabatan.isEmpty()   ? 0 : Long.parseLong(strJabatan));
+        body.put("gaji_pokok",          gajiPokok);
+        body.put("tunjangan_transport", transport);
+        body.put("tunjangan_makan",     makan);
+        body.put("tunjangan_jabatan",   jabatan);
         body.put("bulan",               bulan);
         body.put("tahun",               tahun);
 
@@ -171,8 +193,11 @@ public class SetGajiActivity extends AppCompatActivity {
                             "Gaji berhasil disimpan!", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(SetGajiActivity.this,
-                            "Gagal menyimpan gaji", Toast.LENGTH_SHORT).show();
+                    String pesan = "Gagal menyimpan gaji";
+                    if (response.body() != null && response.body().pesan != null) {
+                        pesan = response.body().pesan;
+                    }
+                    Toast.makeText(SetGajiActivity.this, pesan, Toast.LENGTH_SHORT).show();
                 }
             }
 

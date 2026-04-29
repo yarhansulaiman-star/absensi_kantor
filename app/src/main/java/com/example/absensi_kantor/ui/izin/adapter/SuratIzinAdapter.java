@@ -1,4 +1,4 @@
-package com.example.absensi_kantor.ui;
+package com.example.absensi_kantor.ui.izin.adapter;
 
 import android.graphics.Color;
 import android.view.*;
@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.absensi_kantor.R;
-import com.example.absensi_kantor.model.SuratIzinResponse;
+import com.example.absensi_kantor.model.izin.SuratIzinResponse;
 
 import java.util.List;
 

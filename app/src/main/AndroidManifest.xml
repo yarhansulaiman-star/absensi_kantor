@@ -30,7 +30,7 @@
         <!-- ===================== ACTIVITIES ===================== -->
 
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,17 +38,17 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity"                  android:exported="false" />
-        <activity android:name=".ui.RegisterActivity"           android:exported="false" />
-        <activity android:name=".ui.AbsenActivity"              android:exported="false" />
-        <activity android:name=".ui.GajiActivity"               android:exported="false" />
-        <activity android:name=".ui.LaporanActivity"            android:exported="false" />
-        <activity android:name=".ui.RiwayatActivity"            android:exported="false" />
-        <activity android:name=".ui.ProfilActivity"             android:exported="false" />
-        <activity android:name=".ui.SuratIzinActivity"          android:label="Surat Izin" />
-        <activity android:name=".ui.ApproveSuratIzinActivity"   android:label="Kelola Surat Izin" />
+        <activity android:name=".ui.MainActivity"                  android:exported="false" />
+        <activity android:name=".ui.auth.RegisterActivity"           android:exported="false" />
+        <activity android:name=".ui.absen.AbsenActivity"              android:exported="false" />
+        <activity android:name=".ui.gaji.GajiActivity"               android:exported="false" />
+        <activity android:name=".ui.laporan.LaporanActivity"            android:exported="false" />
+        <activity android:name=".ui.laporan.RiwayatActivity"            android:exported="false" />
+        <activity android:name=".ui.auth.ProfilActivity"             android:exported="false" />
+        <activity android:name=".ui.izin.SuratIzinActivity"          android:label="Surat Izin" />
+        <activity android:name=".ui.izin.ApproveSuratIzinActivity"   android:label="Kelola Surat Izin" />
         <activity
-            android:name=".ui.SetGajiActivity"
+            android:name=".ui.gaji.SetGajiActivity"
             android:exported="false"
             android:label="Input Gaji" />
 
@@ -56,7 +56,7 @@
 
         <!-- FCM Service -->
         <service
-            android:name=".utils.MyfirebaseMessagingService"
+            android:name=".utils.service.MyfirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -64,7 +64,7 @@
         </service>
 
         <receiver
-            android:name=".utils.AbsenReceiver"
+            android:name=".utils.receiver.AbsenReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.example.absensi_kantor.ACTION_ABSEN_MASUK" />
@@ -73,7 +73,7 @@
         </receiver>
 
         <receiver
-            android:name=".utils.BootReceiver"
+            android:name=".utils.receiver.BootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
