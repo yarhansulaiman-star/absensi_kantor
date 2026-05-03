@@ -1,16 +1,22 @@
 package com.example.absensi_kantor.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.WindowInsetsController;
 import android.widget.Toast;
 
 import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.databinding.ActivityMainBinding;
+import com.example.absensi_kantor.model.absen.RiwayatResponse;
 import com.example.absensi_kantor.ui.absen.AbsenActivity;
 import com.example.absensi_kantor.ui.gaji.GajiActivity;
 import com.example.absensi_kantor.ui.laporan.LaporanActivity;
@@ -22,6 +28,7 @@ import com.example.absensi_kantor.utils.DateUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -38,6 +45,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // ── Status bar color (antisipasi deprecated) ────────────────
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.setSystemBarsAppearance(0, 0);
+            }
+        } else {
+            getWindow().setStatusBarColor(0xFF0F3460);
+        }
+
+        View header = findViewById(R.id.headerLayout);
+        ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
+            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            v.setPadding(
+                    v.getPaddingLeft(),
+                    statusBarHeight + 16,
+                    v.getPaddingRight(),
+                    v.getPaddingBottom()
+            );
+            return insets;
+        });
 
         ApiClient.reset();
         ApiClient.init(this);
@@ -74,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
         binding.tombolSuratIzin.setOnClickListener(v ->
                 startActivity(new Intent(this, SuratIzinActivity.class)));
 
+        // ── Statistik ──────────────────────────────────────────────
+        binding.tombolStatistik.setOnClickListener(v ->
+                startActivity(new Intent(this, DashboardStatistikActivity.class)));
+
         // ── Bottom Navigation ───────────────────────────────────────
         binding.bottomNav.setSelectedItemId(R.id.nav_home);
         binding.bottomNav.setOnItemSelectedListener(item -> {
@@ -93,6 +126,51 @@ public class MainActivity extends AppCompatActivity {
             }
 
             return false;
+        });
+
+        // ── Cek status absen hari ini ───────────────────────────────
+        cekStatusAbsenHariIni();
+    }
+
+    // ── Cek apakah sudah absen hari ini dari API ────────────────────
+    private void cekStatusAbsenHariIni() {
+        ApiClient.getService().riwayat().enqueue(new Callback<RiwayatResponse>() {
+            @Override
+            public void onResponse(Call<RiwayatResponse> call, Response<RiwayatResponse> response) {
+                if (!response.isSuccessful() || response.body() == null) return;
+
+                List<RiwayatResponse.DataRiwayat> list = response.body().data;
+                if (list == null || list.isEmpty()) return;
+
+                String tanggalHariIni = DateUtils.getTanggalHariIni();
+
+                for (RiwayatResponse.DataRiwayat item : list) {
+                    if (tanggalHariIni.equals(item.tanggal)) {
+
+                        // Ubah status jadi sudah absen
+                        binding.tvStatusAbsen.setText("Sudah Absen");
+                        binding.tvStatusAbsen.setTextColor(0xFF4ADE80); // hijau
+
+                        // Tampilkan jam masuk
+                        if (item.jam_masuk != null) {
+                            binding.tvJamAbsen.setVisibility(View.VISIBLE);
+                            binding.tvJamAbsen.setText("Masuk: " + item.jam_masuk);
+                        }
+
+                        // Nonaktifkan tombol absen supaya tidak bisa double absen
+                        binding.tombolAbsen.setAlpha(0.5f);
+                        binding.tombolAbsen.setClickable(false);
+
+                        return; // sudah ketemu, stop loop
+                    }
+                }
+                // Tidak ketemu tanggal hari ini = belum absen, UI tetap default
+            }
+
+            @Override
+            public void onFailure(Call<RiwayatResponse> call, Throwable t) {
+                // Gagal koneksi, biarkan status default "Belum Absen"
+            }
         });
     }
 

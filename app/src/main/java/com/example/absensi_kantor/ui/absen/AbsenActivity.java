@@ -3,6 +3,7 @@ package com.example.absensi_kantor.ui.absen;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.*;
+import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -43,25 +44,24 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@SuppressWarnings("UastIncorrectHttpHeaderInspection")
+@androidx.annotation.OptIn(markerClass = ExperimentalGetImage.class)
 public class AbsenActivity extends AppCompatActivity {
 
-    private static final String TAG               = "AbsenActivity";
+    private static final String TAG                = "AbsenActivity";
     private static final int    CAMERA_PERMISSION  = 100;
     private static final int    LOCATION_PERMISSION = 101;
 
     private static final long  RECOGNITION_INTERVAL_MS = 2000;
-
-    // ✅ FIX: Threshold keyakinan minimum di sisi Android
-    // Real-time preview: 65% (lebih longgar, hanya tampilan)
-    // Absen sungguhan: 75% (ketat, untuk keamanan)
-    private static final float MIN_CONFIDENCE_PREVIEW = 65f;
-    private static final float MIN_CONFIDENCE_ABSEN   = 75f;
+    private static final float MIN_CONFIDENCE_PREVIEW  = 50f;
+    private static final float MIN_CONFIDENCE_ABSEN    = 50f;
 
     private ActivityAbsenBinding        binding;
     private SessionManager              session;
@@ -127,7 +127,7 @@ public class AbsenActivity extends AppCompatActivity {
         binding.tombolKembali.setOnClickListener(v -> finish());
     }
 
-    // ── Lokasi GPS ───────────────────────────────────────────────────────────
+    // ── Lokasi GPS ────────────────────────────────────────────────────────────
 
     private void ambilLokasi() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -141,7 +141,6 @@ public class AbsenActivity extends AppCompatActivity {
                 currentLon = loc.getLongitude();
                 binding.labelLokasi.setText(
                         "📍 " + String.format("%.5f, %.5f", currentLat, currentLon));
-                Log.d(TAG, "Lokasi (last known): " + currentLat + ", " + currentLon);
             }
         });
 
@@ -157,17 +156,14 @@ public class AbsenActivity extends AppCompatActivity {
                 if (loc != null) {
                     currentLat = loc.getLatitude();
                     currentLon = loc.getLongitude();
-                    runOnUiThread(() ->
-                            binding.labelLokasi.setText(
-                                    "📍 " + String.format("%.5f, %.5f", currentLat, currentLon))
-                    );
-                    Log.d(TAG, "Lokasi (update): " + currentLat + ", " + currentLon);
+                    runOnUiThread(() -> binding.labelLokasi.setText(
+                            "📍 " + String.format("%.5f, %.5f", currentLat, currentLon)));
                 }
             }
         }, Looper.getMainLooper());
     }
 
-    // ── Kamera ───────────────────────────────────────────────────────────────
+    // ── Kamera ────────────────────────────────────────────────────────────────
 
     private void nyalakanKamera() {
         ListenableFuture<ProcessCameraProvider> future =
@@ -188,13 +184,7 @@ public class AbsenActivity extends AppCompatActivity {
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
 
-                imageAnalysis.setAnalyzer(executor, new ImageAnalysis.Analyzer() {
-                    @Override
-                    @androidx.camera.core.ExperimentalGetImage
-                    public void analyze(@NonNull ImageProxy imageProxy) {
-                        deteksiWajahRealtime(imageProxy);
-                    }
-                });
+                imageAnalysis.setAnalyzer(executor, this::deteksiWajahRealtime);
 
                 CameraSelector selector = pilihKamera(provider);
                 faceOverlay.setFrontCamera(pakaiKameraDepan);
@@ -205,9 +195,9 @@ public class AbsenActivity extends AppCompatActivity {
                 mulaiRealtimeRecognition();
 
             } catch (Exception e) {
-                runOnUiThread(() ->
-                        Toast.makeText(this, "Kamera gagal dibuka: " + e.getMessage(),
-                                Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this,
+                        "Kamera gagal dibuka: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show());
             }
         }, ContextCompat.getMainExecutor(this));
     }
@@ -234,9 +224,9 @@ public class AbsenActivity extends AppCompatActivity {
         return new CameraSelector.Builder().build();
     }
 
-    // ── Real-time Deteksi Wajah ──────────────────────────────────────────────
+    // ── Real-time Deteksi Wajah ───────────────────────────────────────────────
 
-    @androidx.camera.core.ExperimentalGetImage
+    @androidx.annotation.OptIn(markerClass = ExperimentalGetImage.class)
     private void deteksiWajahRealtime(ImageProxy imageProxy) {
         Image mediaImage = imageProxy.getImage();
         if (mediaImage == null) {
@@ -251,13 +241,12 @@ public class AbsenActivity extends AppCompatActivity {
         int imgH = imageProxy.getHeight();
 
         faceDetector.process(image)
-                .addOnSuccessListener(faces ->
-                        faceOverlay.setFaces(faces, imgW, imgH))
+                .addOnSuccessListener(faces -> faceOverlay.setFaces(faces, imgW, imgH))
                 .addOnFailureListener(e -> faceOverlay.clear())
                 .addOnCompleteListener(task -> imageProxy.close());
     }
 
-    // ── Real-time Recognition ────────────────────────────────────────────────
+    // ── Real-time Recognition ─────────────────────────────────────────────────
 
     private void mulaiRealtimeRecognition() {
         recognitionRunnable = new Runnable() {
@@ -309,35 +298,33 @@ public class AbsenActivity extends AppCompatActivity {
         ApiClient.getService().kenali(body)
                 .enqueue(new Callback<AbsenResponse>() {
                     @Override
-                    public void onResponse(Call<AbsenResponse> call,
-                                           Response<AbsenResponse> response) {
+                    public void onResponse(@NonNull Call<AbsenResponse> call,
+                                           @NonNull Response<AbsenResponse> response) {
                         isRecognizing.set(false);
                         if (!response.isSuccessful() || response.body() == null) return;
 
                         AbsenResponse hasil = response.body();
                         runOnUiThread(() -> {
-                            // ✅ FIX: Filter keyakinan minimum untuk preview
                             if (hasil.sukses
                                     && hasil.nama != null
                                     && hasil.keyakinan >= MIN_CONFIDENCE_PREVIEW) {
                                 faceOverlay.showRecognitionResult(
                                         hasil.nama, (float) hasil.keyakinan);
                             } else {
-                                // Keyakinan rendah → jangan tampilkan nama siapapun
                                 faceOverlay.hideRecognitionResult();
                             }
                         });
                     }
 
                     @Override
-                    public void onFailure(Call<AbsenResponse> call, Throwable t) {
+                    public void onFailure(@NonNull Call<AbsenResponse> call, @NonNull Throwable t) {
                         isRecognizing.set(false);
                         Log.e(TAG, "Recognition gagal: " + t.getMessage());
                     }
                 });
     }
 
-    // ── Foto & Absen ─────────────────────────────────────────────────────────
+    // ── Foto & Absen ──────────────────────────────────────────────────────────
 
     private void ambilFotoDanAbsen() {
         if (imageCapture == null) {
@@ -364,10 +351,7 @@ public class AbsenActivity extends AppCompatActivity {
                             });
                             return;
                         }
-
                         Bitmap fixed = ImageUtils.fixBitmap(bitmap, pakaiKameraDepan);
-                        Log.d(TAG, "Foto processed, size: "
-                                + fixed.getWidth() + "x" + fixed.getHeight());
                         deteksiWajahLaluKirim(fixed);
                     }
 
@@ -381,7 +365,7 @@ public class AbsenActivity extends AppCompatActivity {
                 });
     }
 
-    // ── ML Kit: Deteksi Wajah ────────────────────────────────────────────────
+    // ── ML Kit: Deteksi Wajah ─────────────────────────────────────────────────
 
     private void deteksiWajahLaluKirim(Bitmap bitmap) {
         runOnUiThread(() -> setStatus("🔍 Mendeteksi wajah..."));
@@ -390,69 +374,50 @@ public class AbsenActivity extends AppCompatActivity {
 
         faceDetector.process(image)
                 .addOnSuccessListener(faces -> {
-
                     if (faces.isEmpty()) {
                         runOnUiThread(() -> {
-                            setStatus("⚠️ Wajah tidak terdeteksi!\nPastikan wajah terlihat jelas dan pencahayaan cukup.");
+                            setStatus("⚠️ Wajah tidak terdeteksi!\nPastikan wajah terlihat jelas.");
                             binding.tombolAbsen.setEnabled(true);
                         });
                         return;
                     }
 
                     Face face = faces.get(0);
-
                     Rect bounds = face.getBoundingBox();
-                    Log.d(TAG, "Wajah → x=" + bounds.left + ", y=" + bounds.top
-                            + ", w=" + bounds.width() + ", h=" + bounds.height());
+                    Log.d(TAG, "Wajah → " + bounds.width() + "x" + bounds.height());
 
                     Float leftEye  = face.getLeftEyeOpenProbability();
                     Float rightEye = face.getRightEyeOpenProbability();
-                    Log.d(TAG, "Mata kiri=" + leftEye + ", Mata kanan=" + rightEye);
-
-                    if (leftEye != null && rightEye != null) {
-                        if (leftEye < 0.3f && rightEye < 0.3f) {
-                            runOnUiThread(() -> {
-                                setStatus("⚠️ Mata tertutup!\nBuka mata dan coba lagi.");
-                                binding.tombolAbsen.setEnabled(true);
-                            });
-                            return;
-                        }
+                    if (leftEye != null && rightEye != null
+                            && leftEye < 0.3f && rightEye < 0.3f) {
+                        runOnUiThread(() -> {
+                            setStatus("⚠️ Mata tertutup! Buka mata dan coba lagi.");
+                            binding.tombolAbsen.setEnabled(true);
+                        });
+                        return;
                     }
 
                     float rotY = face.getHeadEulerAngleY();
                     float rotZ = face.getHeadEulerAngleZ();
-                    Log.d(TAG, "Rotasi → Y=" + rotY + ", Z=" + rotZ);
-
                     if (Math.abs(rotY) > 30 || Math.abs(rotZ) > 30) {
                         runOnUiThread(() -> {
-                            setStatus("⚠️ Wajah terlalu miring!\nHadapkan wajah ke kamera.");
+                            setStatus("⚠️ Wajah terlalu miring! Hadapkan ke kamera.");
                             binding.tombolAbsen.setEnabled(true);
                         });
                         return;
                     }
 
                     runOnUiThread(() -> setStatus("✅ Wajah terdeteksi, mengirim..."));
-
                     String base64 = ImageUtils.bitmapToBase64(bitmap);
-                    Log.d(TAG, "Base64 length: " + base64.length());
                     kirimAbsen(base64);
                 })
-                .addOnFailureListener(e -> {
-                    runOnUiThread(() -> {
-                        setStatus("❌ Gagal deteksi wajah: " + e.getMessage());
-                        binding.tombolAbsen.setEnabled(true);
-                    });
-                });
+                .addOnFailureListener(e -> runOnUiThread(() -> {
+                    setStatus("❌ Gagal deteksi wajah: " + e.getMessage());
+                    binding.tombolAbsen.setEnabled(true);
+                }));
     }
 
-    private Bitmap flipHorizontal(Bitmap bitmap) {
-        Matrix matrix = new Matrix();
-        matrix.preScale(-1f, 1f);
-        return Bitmap.createBitmap(bitmap, 0, 0,
-                bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-    }
-
-    // ── Kirim ke Server ──────────────────────────────────────────────────────
+    // ── Kirim ke Server ───────────────────────────────────────────────────────
 
     private void kirimAbsen(String base64) {
         runOnUiThread(() -> {
@@ -462,16 +427,14 @@ public class AbsenActivity extends AppCompatActivity {
 
         Map<String, Object> body = new HashMap<>();
         body.put("gambar", base64);
-
         if (currentLat != null) body.put("latitude",  currentLat);
         if (currentLon != null) body.put("longitude", currentLon);
 
         ApiClient.getService().absen(body)
                 .enqueue(new Callback<AbsenResponse>() {
-
                     @Override
-                    public void onResponse(Call<AbsenResponse> call,
-                                           Response<AbsenResponse> response) {
+                    public void onResponse(@NonNull Call<AbsenResponse> call,
+                                           @NonNull Response<AbsenResponse> response) {
                         runOnUiThread(() -> {
                             binding.progressBar.setVisibility(View.GONE);
                             binding.tombolAbsen.setEnabled(true);
@@ -482,30 +445,25 @@ public class AbsenActivity extends AppCompatActivity {
                             }
 
                             AbsenResponse hasil = response.body();
-
                             if (hasil == null) {
                                 setStatus("❌ Response kosong dari server");
                                 return;
                             }
 
                             if (hasil.sukses) {
-                                // ✅ FIX: Double-check keyakinan di sisi Android
-                                // Meski server sudah filter, Android ikut validasi
                                 if (hasil.keyakinan < MIN_CONFIDENCE_ABSEN) {
-                                    setStatus("⚠️ Wajah tidak dikenali dengan pasti.\n"
-                                            + "Keyakinan: " + String.format("%.1f", hasil.keyakinan) + "%\n"
+                                    setStatus("⚠️ Keyakinan terlalu rendah: "
+                                            + String.format("%.1f", hasil.keyakinan) + "%\n"
                                             + "Coba lagi dengan pencahayaan lebih baik.");
                                     return;
                                 }
-
                                 tampilkanHasil(hasil);
 
-                                String waktuSekarang = new SimpleDateFormat(
+                                String waktu = new SimpleDateFormat(
                                         "HH:mm", Locale.getDefault()).format(new Date());
-                                String jenisAbsen = "keluar".equals(hasil.tipe) ? "Pulang" : "Masuk";
+                                String jenis = "keluar".equals(hasil.tipe) ? "Pulang" : "Masuk";
                                 NotificationHelper.tampilkanAbsenBerhasil(
-                                        AbsenActivity.this, jenisAbsen, waktuSekarang);
-
+                                        AbsenActivity.this, jenis, waktu);
                             } else {
                                 setStatus("⚠️ " + hasil.pesan);
                             }
@@ -513,7 +471,7 @@ public class AbsenActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<AbsenResponse> call, Throwable t) {
+                    public void onFailure(@NonNull Call<AbsenResponse> call, @NonNull Throwable t) {
                         runOnUiThread(() -> {
                             binding.progressBar.setVisibility(View.GONE);
                             binding.tombolAbsen.setEnabled(true);
@@ -526,30 +484,25 @@ public class AbsenActivity extends AppCompatActivity {
     // ── Tampilkan Hasil Absen ─────────────────────────────────────────────────
 
     private void tampilkanHasil(AbsenResponse hasil) {
-        String emojiStatus;
-        String labelStatus;
-        String labelTipe;
+        String emojiStatus, labelStatus, labelTipe;
 
         if ("masuk".equals(hasil.tipe)) {
             labelTipe = "🏢 Absen Masuk";
             if ("tepat_waktu".equals(hasil.status)) {
-                emojiStatus = "✅";
-                labelStatus = "Tepat Waktu";
+                emojiStatus = "✅"; labelStatus = "Tepat Waktu";
             } else {
-                emojiStatus = "⚠️";
-                labelStatus = "Terlambat";
+                emojiStatus = "⚠️"; labelStatus = "Terlambat";
             }
         } else if ("keluar".equals(hasil.tipe)) {
-            labelTipe   = "🚪 Absen Keluar";
-            emojiStatus = "✅";
-            labelStatus = "Sudah Keluar";
+            labelTipe = "🚪 Absen Keluar";
+            emojiStatus = "✅"; labelStatus = "Sudah Keluar";
         } else {
-            labelTipe   = "📋 Absen";
+            labelTipe = "📋 Absen";
             emojiStatus = "✅";
             labelStatus = hasil.status != null ? hasil.status : "-";
         }
 
-        String lokasiTampil = (hasil.alamat != null && !hasil.alamat.isEmpty())
+        String lokasi = (hasil.alamat != null && !hasil.alamat.isEmpty())
                 ? hasil.alamat : "Lokasi tidak tersedia";
 
         setStatus(
@@ -562,7 +515,7 @@ public class AbsenActivity extends AppCompatActivity {
                         "📌 Tipe       : " + labelTipe        + "\n" +
                         "🔖 Status     : " + emojiStatus + " " + labelStatus + "\n" +
                         "━━━━━━━━━━━━━━━━━━━━\n" +
-                        "📍 Lokasi:\n"     + lokasiTampil
+                        "📍 Lokasi:\n"     + lokasi
         );
 
         if (hasil.alamat != null && !hasil.alamat.isEmpty()) {
@@ -594,8 +547,7 @@ public class AbsenActivity extends AppCompatActivity {
                 ambilLokasi();
             } else {
                 binding.labelLokasi.setText("📍 Lokasi tidak tersedia");
-                Toast.makeText(this, "Lokasi tidak diizinkan, absen tanpa lokasi",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Absen tanpa lokasi", Toast.LENGTH_SHORT).show();
             }
         }
     }

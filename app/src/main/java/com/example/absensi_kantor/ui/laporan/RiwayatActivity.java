@@ -29,7 +29,7 @@ public class RiwayatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_riwayat);
 
-        // ✅ Init ApiClient agar token otomatis diinject
+        //  Init ApiClient agar token otomatis diinject
         ApiClient.init(this);
 
         recyclerView = findViewById(R.id.recyclerRiwayat);
@@ -44,7 +44,7 @@ public class RiwayatActivity extends AppCompatActivity {
     private void muatRiwayat() {
         progressBar.setVisibility(View.VISIBLE);
 
-        // ✅ Hapus session.getToken() — token sudah otomatis dari interceptor
+        //  Hapus session.getToken() — token sudah otomatis dari interceptor
         ApiClient.getService().riwayat()
                 .enqueue(new Callback<RiwayatResponse>() {
                     @Override
@@ -90,7 +90,7 @@ public class RiwayatActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(VH h, int pos) {
             RiwayatResponse.DataRiwayat item = data.get(pos);
-            h.tanggal.setText("📅 " + item.tanggal);
+            h.tanggal.setText(" " + item.tanggal);
             h.masuk.setText("Masuk : " + (item.jam_masuk  != null ? item.jam_masuk  : "-"));
             h.keluar.setText("Keluar: " + (item.jam_keluar != null ? item.jam_keluar : "-"));
 

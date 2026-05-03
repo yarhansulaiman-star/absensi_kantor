@@ -7,23 +7,24 @@ public class SessionManager {
 
     private static final String PREF_NAME = "absensi_session";
 
-    private static final String KEY_TOKEN    = "token";
-    private static final String KEY_USERNAME = "username";
-    private static final String KEY_ROLE     = "role";
-    private static final String KEY_USER_ID  = "user_id";
+    private static final String KEY_TOKEN       = "token";
+    private static final String KEY_USERNAME    = "username";
+    private static final String KEY_ROLE        = "role";
+    private static final String KEY_USER_ID     = "user_id";
+    private static final String KEY_KARYAWAN_ID = "karyawan_id"; // ✅ tambah
 
     // Dark mode
     private static final String KEY_DARK_MODE = "dark_mode";
 
     // Komponen gaji
-    private static final String KEY_GAJI_POKOK           = "gaji_pokok";
-    private static final String KEY_TUNJANGAN_TRANSPORT  = "tunjangan_transport";
-    private static final String KEY_TUNJANGAN_MAKAN      = "tunjangan_makan";
-    private static final String KEY_TUNJANGAN_JABATAN    = "tunjangan_jabatan";
-    private static final String KEY_TARIF_TERLAMBAT      = "tarif_terlambat";
-    private static final String KEY_TARIF_ALPHA          = "tarif_alpha";
+    private static final String KEY_GAJI_POKOK          = "gaji_pokok";
+    private static final String KEY_TUNJANGAN_TRANSPORT = "tunjangan_transport";
+    private static final String KEY_TUNJANGAN_MAKAN     = "tunjangan_makan";
+    private static final String KEY_TUNJANGAN_JABATAN   = "tunjangan_jabatan";
+    private static final String KEY_TARIF_TERLAMBAT     = "tarif_terlambat";
+    private static final String KEY_TARIF_ALPHA         = "tarif_alpha";
 
-    private SharedPreferences prefs;
+    private SharedPreferences        prefs;
     private SharedPreferences.Editor editor;
 
     public SessionManager(Context context) {
@@ -64,6 +65,16 @@ public class SessionManager {
         return getToken() != null && !getToken().isEmpty();
     }
 
+    // ===================== KARYAWAN ID ===================== // ✅ tambah
+    public void simpanKaryawanId(int karyawanId) {
+        editor.putInt(KEY_KARYAWAN_ID, karyawanId);
+        editor.apply();
+    }
+
+    public int getKaryawanId() {
+        return prefs.getInt(KEY_KARYAWAN_ID, 0);
+    }
+
     // ===================== DARK MODE =====================
     public void setDarkMode(boolean isDark) {
         editor.putBoolean(KEY_DARK_MODE, isDark);
@@ -86,8 +97,6 @@ public class SessionManager {
         editor.putLong(KEY_TUNJANGAN_TRANSPORT, (long) tunjanganTransport);
         editor.putLong(KEY_TUNJANGAN_MAKAN, (long) tunjanganMakan);
         editor.putLong(KEY_TUNJANGAN_JABATAN, (long) tunjanganJabatan);
-
-        // 🔥 FIX DI SINI (tetap long biar konsisten)
         editor.putLong(KEY_TARIF_TERLAMBAT, (long) tarifTerlambat);
         editor.putLong(KEY_TARIF_ALPHA, (long) tarifAlpha);
 
@@ -110,7 +119,6 @@ public class SessionManager {
         return prefs.getLong(KEY_TUNJANGAN_JABATAN, 0);
     }
 
-    // 🔥 FIX PENTING DI SINI
     public long getTarifTerlambat() {
         return prefs.getLong(KEY_TARIF_TERLAMBAT, 500);
     }

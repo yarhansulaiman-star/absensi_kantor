@@ -5,14 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:background="#F0F4FF"
     tools:context=".ui.MainActivity">
 
-    <!-- APP BAR -->
+    <!-- APP BAR (tersembunyi, toolbar tetap ada agar setSupportActionBar tidak crash) -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:elevation="0dp"
         app:elevation="0dp">
 
@@ -20,11 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#1565C0"
-            app:title="Absensi Kantor"
-            app:titleTextColor="#FFFFFF"
-            app:subtitle=""
-            app:subtitleTextColor="#BBDEFB"/>
+            android:visibility="gone"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -39,324 +35,632 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="100dp">
+            android:paddingBottom="88dp">
 
-            <!-- HEADER CARD -->
-            <androidx.cardview.widget.CardView
+            <!-- ═══════════════════════════════════════════════════
+                 HEADER — dark navy gradient background
+                 ═══════════════════════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/headerLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                android:orientation="vertical"
+                android:background="#0F3460"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="28dp">
 
+                <!-- Row: Avatar + Name + Role badge -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="#1565C0"
-                    android:padding="24dp"
-                    android:gravity="center">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
 
-                    <ImageView
-                        android:id="@+id/imageAvatar"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:background="#FFFFFF"
-                        android:padding="8dp"
-                        android:contentDescription="Avatar"/>
+                    <!-- Avatar circle -->
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp">
+                        <ImageView
+                            android:id="@+id/imageAvatar"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:src="@mipmap/ic_launcher"
+                            android:background="@drawable/circle_avatar_bg"
+                            android:padding="2dp"
+                            android:contentDescription="Avatar"/>
+                    </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/labelWelcome"
-                        android:layout_width="wrap_content"
+                    <!-- Name + greeting -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"
-                        android:gravity="center"
-                        tools:text="Selamat datang, Budi!"/>
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Selamat datang,"
+                            android:textSize="11sp"
+                            android:textColor="#99BFFF"/>
+
+                        <TextView
+                            android:id="@+id/labelWelcome"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            tools:text="Selamat datang, Yarhan!"/>
+
+                    </LinearLayout>
+
+                    <!-- Role badge -->
                     <TextView
                         android:id="@+id/labelRole"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textSize="13sp"
-                        android:textColor="#BBDEFB"
-                        android:gravity="center"
-                        tools:text="Role: hrd"/>
+                        android:background="@drawable/badge_role_bg"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:textSize="10sp"
+                        android:textColor="#CCDDFF"
+                        tools:text="● user"/>
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <!-- SECTION LABEL -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Menu Utama"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#757575"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="4dp"/>
+                <!-- Status card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#1A2A4A">
 
-            <!-- GRID MENU ROW 1: Absen + Laporan -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Status hari ini"
+                                android:textSize="10sp"
+                                android:textColor="#7799CC"/>
+
+                            <TextView
+                                android:id="@+id/tvStatusAbsen"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Belum Absen"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#FF6B6B"
+                                android:layout_marginTop="2dp"/>
+
+                            <TextView
+                                android:id="@+id/tvJamAbsen"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="10sp"
+                                android:textColor="#7799CC"
+                                android:layout_marginTop="2dp"
+                                android:visibility="gone"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="end">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Lokasi Kerja"
+                                android:textSize="10sp"
+                                android:textColor="#7799CC"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Kantor Pusat"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#FFFFFF"
+                                android:layout_marginTop="2dp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- ═══════════════════════════════════════════════════
+                 CONTENT AREA
+                 ═══════════════════════════════════════════════════ -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp">
 
+                <!-- ── TOMBOL ABSEN UTAMA (CTA) ──────────────────── -->
                 <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="3dp">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#0F3460">
+
                     <LinearLayout
                         android:id="@+id/tombolAbsen"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="#1976D2"
+                        android:layout_height="64dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <!-- Icon box -->
+                        <FrameLayout
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/icon_box"
+                            android:backgroundTint="#26FFFFFF">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_camera"
+                                app:tint="#FFFFFF"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Absen Sekarang"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="#FFFFFF"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tap untuk check-in"
+                                android:textSize="11sp"
+                                android:textColor="#99BFFF"
+                                android:layout_marginTop="1dp"/>
+
+                        </LinearLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📸"
-                            android:textSize="32sp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Absen"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="8dp"/>
+                            android:text="›"
+                            android:textSize="22sp"
+                            android:textColor="#99BFFF"/>
+
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
+                <!-- ── LABEL MENU ────────────────────────────────── -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Menu"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A2E"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="2dp"/>
+
+                <!-- ── GRID MENU ROW 1: Laporan + Statistik ──────── -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <!-- Laporan -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="1dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <LinearLayout
+                            android:id="@+id/tombolLaporan"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:paddingTop="16dp"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground">
+
+                            <FrameLayout
+                                android:layout_width="34dp"
+                                android:layout_height="34dp"
+                                android:background="@drawable/icon_box_purple">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@android:drawable/ic_menu_agenda"
+                                    app:tint="#7C4DFF"/>
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Laporan"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#1A1A2E"
+                                android:layout_marginTop="8dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Lihat rekap"
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"
+                                android:layout_marginTop="1dp"/>
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Statistik -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="1dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <LinearLayout
+                            android:id="@+id/tombolStatistik"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:paddingTop="16dp"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground">
+
+                            <FrameLayout
+                                android:layout_width="34dp"
+                                android:layout_height="34dp"
+                                android:background="@drawable/icon_box_green">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@android:drawable/ic_menu_sort_by_size"
+                                    app:tint="#2E7D32"/>
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Statistik"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#1A1A2E"
+                                android:layout_marginTop="8dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Grafik bulanan"
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"
+                                android:layout_marginTop="1dp"/>
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+                <!-- ── GRID MENU ROW 2: Riwayat + Export PDF ─────── -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Riwayat -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="1dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <LinearLayout
+                            android:id="@+id/tombolRiwayat"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:paddingTop="16dp"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground">
+
+                            <FrameLayout
+                                android:layout_width="34dp"
+                                android:layout_height="34dp"
+                                android:background="@drawable/icon_box_orange">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@android:drawable/ic_menu_recent_history"
+                                    app:tint="#E65100"/>
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Riwayat"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#1A1A2E"
+                                android:layout_marginTop="8dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="History absen"
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"
+                                android:layout_marginTop="1dp"/>
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Export PDF -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="1dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <LinearLayout
+                            android:id="@+id/tombolExportPdf"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:paddingTop="16dp"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground">
+
+                            <FrameLayout
+                                android:layout_width="34dp"
+                                android:layout_height="34dp"
+                                android:background="@drawable/icon_box_red">
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:src="@android:drawable/ic_menu_save"
+                                    app:tint="#C62828"/>
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Export PDF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#1A1A2E"
+                                android:layout_marginTop="8dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Unduh laporan"
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"
+                                android:layout_marginTop="1dp"/>
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+                <!-- ── SURAT IZIN (row card) ──────────────────────── -->
                 <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="3dp">
+                    android:id="@+id/cardSuratIzin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="1dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
                     <LinearLayout
-                        android:id="@+id/tombolLaporan"
+                        android:id="@+id/tombolSuratIzin"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="#388E3C"
+                        android:layout_height="68dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <FrameLayout
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:background="@drawable/icon_box_blue">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_edit"
+                                app:tint="#1565C0"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Surat Izin"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#1A1A2E"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ajukan &amp; lihat surat izin"
+                                android:textSize="11sp"
+                                android:textColor="#9E9E9E"
+                                android:layout_marginTop="1dp"/>
+
+                        </LinearLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📋"
-                            android:textSize="32sp"/>
+                            android:text="›"
+                            android:textSize="20sp"
+                            android:textColor="#CCCCCC"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- ── KELOLA GAJI — hanya HRD/Admin (visibility dikontrol Java) ── -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardGaji"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="1dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:id="@+id/tombolGaji"
+                        android:layout_width="match_parent"
+                        android:layout_height="68dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <FrameLayout
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:background="@drawable/icon_box_navy">
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_manage"
+                                app:tint="#0F3460"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Kelola Gaji"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#1A1A2E"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Input &amp; lihat data gaji karyawan"
+                                android:textSize="11sp"
+                                android:textColor="#9E9E9E"
+                                android:layout_marginTop="1dp"/>
+
+                        </LinearLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Laporan"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="8dp"/>
+                            android:text="›"
+                            android:textSize="20sp"
+                            android:textColor="#CCCCCC"/>
+
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
             </LinearLayout>
-
-            <!-- GRID MENU ROW 2: Riwayat + Export PDF -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="3dp">
-                    <LinearLayout
-                        android:id="@+id/tombolRiwayat"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="#F57C00"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📜"
-                            android:textSize="32sp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Riwayat"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="8dp"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="3dp">
-                    <LinearLayout
-                        android:id="@+id/tombolExportPdf"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="#7B1FA2"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📄"
-                            android:textSize="32sp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Export PDF"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="8dp"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
-
-            <!-- SURAT IZIN — semua role bisa akses -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardSuratIzin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="3dp">
-                <LinearLayout
-                    android:id="@+id/tombolSuratIzin"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#00897B"
-                    android:paddingStart="24dp"
-                    android:paddingEnd="24dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📝"
-                        android:textSize="28sp"/>
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="16dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Surat Izin"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ajukan &amp; lihat surat izin"
-                            android:textColor="#B2DFDB"
-                            android:textSize="12sp"/>
-                    </LinearLayout>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textColor="#FFFFFF"
-                        android:textSize="24sp"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- KELOLA GAJI — hanya HRD/Admin -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardGaji"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="3dp">
-                <LinearLayout
-                    android:id="@+id/tombolGaji"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#1565C0"
-                    android:paddingStart="24dp"
-                    android:paddingEnd="24dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="💰"
-                        android:textSize="28sp"/>
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="16dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Kelola Gaji"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Input &amp; lihat data gaji karyawan"
-                            android:textColor="#BBDEFB"
-                            android:textSize="12sp"/>
-                    </LinearLayout>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textColor="#FFFFFF"
-                        android:textSize="24sp"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

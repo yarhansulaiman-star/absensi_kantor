@@ -10,11 +10,13 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.ui.absen.AbsenActivity;
+import com.example.absensi_kantor.utils.NotificationHelper;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -27,8 +29,8 @@ import retrofit2.Response;
 
 public class MyfirebaseMessagingService extends FirebaseMessagingService {
 
-    private static final String TAG        = "FCMService";
-    private static final String CHANNEL_ID = "absen_channel";
+    private static final String TAG          = "FCMService";
+    private static final String CHANNEL_ID   = "absen_channel";
     private static final String CHANNEL_NAME = "Notifikasi Absen";
 
     @Override
@@ -43,7 +45,7 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
             body  = remoteMessage.getNotification().getBody();
         }
 
-        if (remoteMessage.getData().size() > 0) {
+        if (!remoteMessage.getData().isEmpty()) {
             if (remoteMessage.getData().containsKey("title"))
                 title = remoteMessage.getData().get("title");
             if (remoteMessage.getData().containsKey("body"))
@@ -57,13 +59,11 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         Log.d(TAG, "FCM Token baru: " + token);
 
-        // Simpan token ke SharedPreferences
         getSharedPreferences("fcm_pref", MODE_PRIVATE)
                 .edit()
                 .putString("fcm_token", token)
                 .apply();
 
-        // Kirim token ke server
         kirimTokenKeServer(token);
     }
 
@@ -85,12 +85,13 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
                     .simpanFcmToken("Bearer " + savedToken, body)
                     .enqueue(new Callback<Void>() {
                         @Override
-                        public void onResponse(Call<Void> call, Response<Void> response) {
+                        public void onResponse(@NonNull Call<Void> call,
+                                               @NonNull Response<Void> response) {
                             Log.d(TAG, "✅ Token FCM berhasil dikirim ke server");
                         }
 
                         @Override
-                        public void onFailure(Call<Void> call, Throwable t) {
+                        public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                             Log.e(TAG, "❌ Gagal kirim token FCM: " + t.getMessage());
                         }
                     });
@@ -100,23 +101,27 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void tampilkanNotifikasi(String title, String body) {
+        // Cek permission POST_NOTIFICATIONS (Android 13+)
+        if (!NotificationHelper.canSendNotification(this)) {
+            Log.w(TAG, "Notifikasi diblokir — izin POST_NOTIFICATIONS belum diberikan");
+            return;
+        }
+
         Intent intent = new Intent(this, AbsenActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE
-        );
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationManager manager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager == null) return;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
-                    CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_HIGH
-            );
+                    CHANNEL_ID, CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("Pengingat absen masuk dan pulang");
             manager.createNotificationChannel(channel);
         }
@@ -130,6 +135,9 @@ public class MyfirebaseMessagingService extends FirebaseMessagingService {
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setContentIntent(pendingIntent);
 
-        manager.notify((int) System.currentTimeMillis(), builder.build());
+        // Permission sudah dicek di atas via canSendNotification()
+        //noinspection MissingPermission
+        NotificationManagerCompat.from(this)
+                .notify((int) System.currentTimeMillis(), builder.build());
     }
 }

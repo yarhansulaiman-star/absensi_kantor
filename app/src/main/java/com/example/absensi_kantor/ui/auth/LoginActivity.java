@@ -89,25 +89,45 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(TAG, "sukses=" + res.sukses + ", role=" + res.role);
 
                     if (res.sukses) {
+                        // ✅ Simpan session
                         session.simpanSession(res.token, res.username, res.role, res.userId);
+                        session.simpanKaryawanId(res.karyawanId);
+                        if (res.sukses) {
+                            session.simpanSession(res.token, res.username, res.role, res.userId);
+                            session.simpanKaryawanId(res.karyawanId);
 
-                        if (res.gajiPokok > 0) {
-                            session.simpanDataGaji(
-                                    (long) res.gajiPokok,
-                                    (long) res.tunjanganTransport,
-                                    (long) res.tunjanganMakan,
-                                    (long) res.tunjanganJabatan,
-                                    50000,
-                                    100000
-                            );
+                            // ✅ Debug paksa — cek apakah tersimpan
+                            Log.d(TAG, "=== DEBUG LOGIN ===");
+                            Log.d(TAG, "res.karyawanId = " + res.karyawanId);
+                            Log.d(TAG, "res.gajiPokok = " + res.gajiPokok);
+                            Log.d(TAG, "session.getKaryawanId() = " + session.getKaryawanId());
+                            Log.d(TAG, "session.getGajiPokok() = " + session.getGajiPokok());
+                            Log.d(TAG, "==================");
                         }
+                        long tarifTerlambat = res.tarifTerlambat > 0
+                                ? (long) res.tarifTerlambat : 1000;
+                        long tarifAlpha     = res.tarifAlpha > 0
+                                ? (long) res.tarifAlpha : 100000;
+
+                        session.simpanDataGaji(
+                                (long) res.gajiPokok,
+                                (long) res.tunjanganTransport,
+                                (long) res.tunjanganMakan,
+                                (long) res.tunjanganJabatan,
+                                tarifTerlambat,
+                                tarifAlpha
+                        );
+
+                        Log.d(TAG, "Gaji tersimpan → pokok=" + (long) res.gajiPokok
+                                + ", transport=" + (long) res.tunjanganTransport
+                                + ", makan="     + (long) res.tunjanganMakan
+                                + ", jabatan="   + (long) res.tunjanganJabatan);
 
                         // Jadwalkan alarm absen
                         AlarmScheduler.jadwalkanPengingatAbsen(LoginActivity.this);
 
                         // Ambil FCM Token lalu buka MainActivity di dalamnya
                         ambilFcmToken();
-
 
                     } else {
                         tampilkanError(res.pesan != null ? res.pesan
@@ -154,16 +174,16 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onResponse(Call<Void> call, Response<Void> response) {
                                         Log.d(TAG, "FCM token terkirim: " + response.code());
-                                        bukaMainActivity(); // ✅ di sini
+                                        bukaMainActivity();
                                     }
                                     @Override
                                     public void onFailure(Call<Void> call, Throwable t) {
                                         Log.e(TAG, "Gagal: " + t.getMessage());
-                                        bukaMainActivity(); // ✅ di sini
+                                        bukaMainActivity();
                                     }
                                 });
                     } else {
-                        bukaMainActivity(); // ✅ di sini
+                        bukaMainActivity();
                     }
                 });
     }

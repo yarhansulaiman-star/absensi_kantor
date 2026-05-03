@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
@@ -17,7 +18,9 @@ import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.ApiService;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.model.absen.RiwayatResponse;
+import com.example.absensi_kantor.model.gaji.GajiResponse;
 
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
@@ -25,6 +28,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProfilActivity extends AppCompatActivity {
+
+    private static final String TAG = "ProfilActivity";
 
     private SessionManager session;
     private ApiService     api;
@@ -67,7 +72,6 @@ public class ProfilActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Profil");
         }
 
-        // Gunakan ApiClient.getService() sesuai implementasi yang ada
         ApiClient.init(this);
         api = ApiClient.getService();
 
@@ -123,6 +127,77 @@ public class ProfilActivity extends AppCompatActivity {
         txtGajiPokok.setText("Gaji Pokok          : Rp " + formatRupiah(session.getGajiPokok()));
         txtTunjangan.setText("Total Tunjangan  : Rp " + formatRupiah(session.getTotalTunjangan()));
         txtTotalPenghasilan.setText("Total Penghasilan : Rp " + formatRupiah(session.getTotalPenghasilan()));
+
+        Calendar cal   = Calendar.getInstance();
+        int bulan      = cal.get(Calendar.MONTH) + 1;
+        int tahun      = cal.get(Calendar.YEAR);
+        int karyawanId = session.getKaryawanId();
+
+        // ✅ Debug — cek nilai sebelum request
+        Log.d(TAG, "loadGaji → karyawanId=" + karyawanId
+                + ", bulan=" + bulan + ", tahun=" + tahun);
+
+        if (karyawanId == 0) {
+            Log.e(TAG, "❌ karyawanId=0, belum login ulang setelah update!");
+            return;
+        }
+
+        ApiClient.getService().getGaji(karyawanId, bulan, tahun)
+                .enqueue(new Callback<GajiResponse>() {
+                    @Override
+                    public void onResponse(Call<GajiResponse> call,
+                                           Response<GajiResponse> response) {
+                        Log.d(TAG, "getGaji response code: " + response.code());
+
+                        if (!response.isSuccessful() || response.body() == null) {
+                            Log.w(TAG, "getGaji tidak sukses: " + response.code());
+                            try {
+                                String err = response.errorBody() != null
+                                        ? response.errorBody().string() : "null";
+                                Log.e(TAG, "errorBody: " + err);
+                            } catch (Exception ignored) {}
+                            return;
+                        }
+
+                        GajiResponse gaji = response.body();
+                        Log.d(TAG, "getGaji sukses=" + gaji.sukses
+                                + ", data=" + (gaji.data != null ? "ada" : "null"));
+
+                        if (!gaji.sukses || gaji.data == null) {
+                            Log.w(TAG, "getGaji sukses=false atau data null: " + gaji.pesan);
+                            return;
+                        }
+
+                        GajiResponse.GajiData d = gaji.data;
+                        Log.d(TAG, "gaji_pokok=" + d.gaji_pokok
+                                + ", transport=" + d.tunjangan_transport
+                                + ", makan=" + d.tunjangan_makan
+                                + ", jabatan=" + d.tunjangan_jabatan);
+
+                        session.simpanDataGaji(
+                                d.gaji_pokok,
+                                d.tunjangan_transport,
+                                d.tunjangan_makan,
+                                d.tunjangan_jabatan,
+                                1000,
+                                100000
+                        );
+
+                        runOnUiThread(() -> {
+                            txtGajiPokok.setText("Gaji Pokok          : Rp "
+                                    + formatRupiah(session.getGajiPokok()));
+                            txtTunjangan.setText("Total Tunjangan  : Rp "
+                                    + formatRupiah(session.getTotalTunjangan()));
+                            txtTotalPenghasilan.setText("Total Penghasilan : Rp "
+                                    + formatRupiah(session.getTotalPenghasilan()));
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Call<GajiResponse> call, Throwable t) {
+                        Log.e(TAG, "❌ getGaji onFailure: " + t.getMessage());
+                    }
+                });
     }
 
     // ===================== LOAD VERSI APLIKASI =====================
@@ -143,7 +218,8 @@ public class ProfilActivity extends AppCompatActivity {
 
         api.riwayat().enqueue(new Callback<RiwayatResponse>() {
             @Override
-            public void onResponse(Call<RiwayatResponse> call, Response<RiwayatResponse> response) {
+            public void onResponse(Call<RiwayatResponse> call,
+                                   Response<RiwayatResponse> response) {
                 if (!response.isSuccessful() || response.body() == null) return;
 
                 RiwayatResponse body = response.body();
@@ -169,7 +245,7 @@ public class ProfilActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     txtStatHadir.setText(String.valueOf(finalHadir));
                     txtStatTerlambat.setText(String.valueOf(finalTerlambat));
-                    txtStatIzin.setText("-"); // isi dari API surat izin jika tersedia
+                    txtStatIzin.setText("-");
                 });
             }
 
@@ -190,7 +266,8 @@ public class ProfilActivity extends AppCompatActivity {
         switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             session.setDarkMode(isChecked);
             AppCompatDelegate.setDefaultNightMode(
-                    isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                    isChecked ? AppCompatDelegate.MODE_NIGHT_YES
+                            : AppCompatDelegate.MODE_NIGHT_NO
             );
         });
 
@@ -206,7 +283,8 @@ public class ProfilActivity extends AppCompatActivity {
                             session.clearSession();
                             ApiClient.reset();
                             Intent intent = new Intent(ProfilActivity.this, LoginActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();
                         })
@@ -223,17 +301,20 @@ public class ProfilActivity extends AppCompatActivity {
 
         EditText etPasswordLama = new EditText(this);
         etPasswordLama.setHint("Password Lama");
-        etPasswordLama.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        etPasswordLama.setInputType(
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         layout.addView(etPasswordLama);
 
         EditText etPasswordBaru = new EditText(this);
         etPasswordBaru.setHint("Password Baru");
-        etPasswordBaru.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        etPasswordBaru.setInputType(
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         layout.addView(etPasswordBaru);
 
         EditText etKonfirmasi = new EditText(this);
         etKonfirmasi.setHint("Konfirmasi Password Baru");
-        etKonfirmasi.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        etKonfirmasi.setInputType(
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         layout.addView(etKonfirmasi);
 
         new AlertDialog.Builder(this)
@@ -245,19 +326,22 @@ public class ProfilActivity extends AppCompatActivity {
                     String konfirmasi = etKonfirmasi.getText().toString().trim();
 
                     if (lama.isEmpty() || baru.isEmpty() || konfirmasi.isEmpty()) {
-                        Toast.makeText(this, "Semua field wajib diisi", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Semua field wajib diisi",
+                                Toast.LENGTH_SHORT).show();
                         return;
                     }
                     if (!baru.equals(konfirmasi)) {
-                        Toast.makeText(this, "Password baru tidak cocok", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Password baru tidak cocok",
+                                Toast.LENGTH_SHORT).show();
                         return;
                     }
                     if (baru.length() < 6) {
-                        Toast.makeText(this, "Password minimal 6 karakter", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Password minimal 6 karakter",
+                                Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    // TODO: panggil API ganti password jika endpoint tersedia
-                    Toast.makeText(this, "Fitur ganti password akan segera tersedia", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Fitur ganti password akan segera tersedia",
+                            Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Batal", null)
                 .show();
