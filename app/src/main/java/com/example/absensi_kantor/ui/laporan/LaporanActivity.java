@@ -1,6 +1,10 @@
 package com.example.absensi_kantor.ui.laporan;
 
+import com.example.absensi_kantor.R;
+import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,7 +13,10 @@ import android.widget.Toast;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.databinding.ActivityLaporanBinding;
 import com.example.absensi_kantor.model.laporan.LaporanResponse;
+import com.example.absensi_kantor.ui.MainActivity;
+import com.example.absensi_kantor.ui.auth.ProfilActivity;
 import com.example.absensi_kantor.utils.DateUtils;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,8 +32,22 @@ public class LaporanActivity extends AppCompatActivity {
         binding = ActivityLaporanBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // ✅ Init ApiClient agar token otomatis diinject
         ApiClient.init(this);
+
+        // ── Sesuaikan posisi header dengan status bar HP nyata ──────
+        ViewCompat.setOnApplyWindowInsetsListener(
+                binding.getRoot(), (v, insets) -> {
+                    int statusBarHeight = insets.getInsets(
+                            WindowInsetsCompat.Type.statusBars()).top;
+                    binding.layoutHeader.setPadding(
+                            binding.layoutHeader.getPaddingLeft(),
+                            statusBarHeight + 16,
+                            binding.layoutHeader.getPaddingRight(),
+                            binding.layoutHeader.getPaddingBottom()
+                    );
+                    return insets;
+                }
+        );
 
         binding.labelTanggal.setText("📅 " + DateUtils.getTanggalTampil());
         muatLaporan(DateUtils.getTanggalHariIni());
@@ -35,6 +56,31 @@ public class LaporanActivity extends AppCompatActivity {
                 muatLaporan(DateUtils.getTanggalHariIni()));
 
         binding.tombolKembali.setOnClickListener(v -> finish());
+
+        // ── Bottom Navigation ───────────────────────────────────────
+        BottomNavigationView bottomNav = binding.bottomNav;
+        bottomNav.setSelectedItemId(R.id.nav_laporan);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_riwayat) {
+                startActivity(new Intent(this, RiwayatActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_laporan) {
+                return true; // sudah di halaman ini
+            } else if (id == R.id.nav_profil) {
+                startActivity(new Intent(this, ProfilActivity.class));
+                finish();
+                return true;
+            }
+
+            return false;
+        });
     }
 
     private void muatLaporan(String tanggal) {
@@ -42,7 +88,6 @@ public class LaporanActivity extends AppCompatActivity {
         binding.recyclerLaporan.setVisibility(View.GONE);
         binding.labelKosong.setVisibility(View.GONE);
 
-        // ✅ Hapus session.getToken() — token sudah otomatis dari interceptor
         ApiClient.getService()
                 .laporan(tanggal)
                 .enqueue(new Callback<LaporanResponse>() {

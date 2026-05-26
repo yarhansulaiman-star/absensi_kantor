@@ -3,523 +3,319 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="#F0F4FF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingBottom="24dp">
 
-        <!-- ============ HEADER KARYAWAN ============ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#1565C0"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/tvNamaKaryawan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_nama_karyawan"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/tvJabatan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_jabatan"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp"/>
-
-                <TextView
-                    android:id="@+id/tvPeriode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_periode"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:layout_marginTop="2dp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ============ PILIH KARYAWAN (HRD only) ============ -->
+        <!-- ============ HEADER ============ -->
         <LinearLayout
-            android:id="@+id/layoutSpinnerKaryawan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
+            android:background="#0F3460"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="28dp">
 
             <TextView
+                android:id="@+id/tvNamaKaryawan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pilih Karyawan"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_marginBottom="8dp"/>
+                android:text="@string/label_nama_karyawan"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
 
-            <Spinner
-                android:id="@+id/spinnerKaryawan"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvJabatan"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"/>
+                android:text="@string/label_jabatan"
+                android:textColor="#99BFFF"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/tvPeriode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_periode"
+                android:textColor="#99BFFF"
+                android:textSize="13sp"
+                android:layout_marginTop="2dp"/>
         </LinearLayout>
 
-        <!-- ============ PILIH PERIODE ============ -->
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp">
 
+            <!-- ============ PILIH KARYAWAN (HRD only) ============ -->
             <LinearLayout
+                android:id="@+id/layoutSpinnerKaryawan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:visibility="gone"
+                android:background="#FFFFFF"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_pilih_periode"
+                    android:text="Pilih Karyawan"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#333333"
+                    android:textColor="#0F3460"
                     android:layout_marginBottom="8dp"/>
 
-                <LinearLayout
+                <Spinner
+                    android:id="@+id/spinnerKaryawan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <Spinner
-                        android:id="@+id/spinnerBulan"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="2"
-                        android:layout_marginEnd="8dp"/>
-
-                    <Spinner
-                        android:id="@+id/spinnerTahun"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"/>
-
-                    <Button
-                        android:id="@+id/btnCariGaji"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_cari"
-                        android:backgroundTint="#1565C0"
-                        android:textColor="#FFFFFF"/>
-                </LinearLayout>
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:layout_marginTop="8dp"/>
+                    android:minHeight="48dp"/>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
-        <!-- ============ PENGHASILAN ============ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
-
-            <LinearLayout
+            <!-- ============ PILIH PERIODE ============ -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_penghasilan"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="#2E7D32"
-                    android:layout_marginBottom="10dp"/>
-
-                <!-- Gaji Pokok -->
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_gaji_pokok"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvGajiPokok"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_rp"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <!-- Tunjangan Transport -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_tunjangan_transport"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvTunjanganTransport"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_rp"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <!-- Tunjangan Makan -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_tunjangan_makan"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvTunjanganMakan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_rp"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <!-- Tunjangan Jabatan -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_tunjangan_jabatan"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvTunjanganJabatan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_rp"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <!-- Uang Lembur -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="10dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_uang_lembur"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvUangLembur"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_rp"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Total Penghasilan -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_total_penghasilan"
-                        android:textStyle="bold"
-                        android:textColor="#2E7D32"/>
-                    <TextView
-                        android:id="@+id/tvTotalPenghasilan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_rp"
-                        android:textStyle="bold"
-                        android:textColor="#2E7D32"/>
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ============ POTONGAN ============ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_potongan"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="#C62828"
-                    android:layout_marginBottom="10dp"/>
-
-                <!-- Potongan Terlambat -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_keterlambatan"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvPotonganTerlambat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_minus_rp"
-                        android:textColor="#C62828"/>
-                </LinearLayout>
-
-                <!-- Detail Terlambat -->
-                <LinearLayout
-                    android:id="@+id/layoutDetailTerlambat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="#FFF8F8"
-                    android:padding="8dp"
-                    android:layout_marginBottom="8dp"/>
+                    android:padding="16dp">
 
-                <!-- Potongan Alpha -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_alpha"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvPotonganAlpha"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/default_minus_rp"
-                        android:textColor="#C62828"/>
-                </LinearLayout>
-
-                <!-- BPJS Kesehatan -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_bpjs_kesehatan"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvBpjsKesehatan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_minus_rp"
-                        android:textColor="#C62828"/>
-                </LinearLayout>
-
-                <!-- BPJS TK -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="6dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_bpjs_tk"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvBpjsTk"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_minus_rp"
-                        android:textColor="#C62828"/>
-                </LinearLayout>
-
-                <!-- PPh21 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="10dp">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_pph21"
-                        android:textColor="#555555"/>
-                    <TextView
-                        android:id="@+id/tvPph21"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_minus_rp"
-                        android:textColor="#C62828"/>
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Total Potongan -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/label_total_potongan"
+                        android:text="@string/label_pilih_periode"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="#C62828"/>
-                    <TextView
-                        android:id="@+id/tvTotalPotongan"
-                        android:layout_width="wrap_content"
+                        android:textColor="#0F3460"
+                        android:layout_marginBottom="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/default_minus_rp"
-                        android:textStyle="bold"
-                        android:textColor="#C62828"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <Spinner
+                            android:id="@+id/spinnerBulan"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:layout_marginEnd="8dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinnerTahun"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"/>
+
+                        <Button
+                            android:id="@+id/btnCariGaji"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_cari"
+                            android:backgroundTint="#0F3460"
+                            android:textColor="#FFFFFF"/>
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:layout_marginTop="8dp"/>
                 </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-        <!-- ============ GAJI BERSIH ============ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
+            <!-- ============ PENGHASILAN ============ -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#1B5E20"
-                android:padding="20dp"
-                android:gravity="center">
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_gaji_bersih"
-                    android:textColor="#A5D6A7"
-                    android:textSize="14sp"
-                    android:letterSpacing="0.1"/>
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/tvGajiBersih"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_penghasilan"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32"
+                        android:layout_marginBottom="10dp"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_gaji_pokok" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvGajiPokok" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_rp" android:textColor="#333333"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_tunjangan_transport" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvTunjanganTransport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_rp" android:textColor="#333333"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_tunjangan_makan" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvTunjanganMakan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_rp" android:textColor="#333333"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_tunjangan_jabatan" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvTunjanganJabatan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_rp" android:textColor="#333333"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="10dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_uang_lembur" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvUangLembur" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_rp" android:textColor="#333333"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="8dp"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_total_penghasilan" android:textStyle="bold" android:textColor="#2E7D32"/>
+                        <TextView android:id="@+id/tvTotalPenghasilan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_rp" android:textStyle="bold" android:textColor="#2E7D32"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ============ POTONGAN ============ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/default_rp"
-                    android:textColor="#FFFFFF"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="4dp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-        <!-- ============ TOMBOL ============ -->
-        <Button
-            android:id="@+id/btnInputGaji"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="@string/label_btn_input_gaji"
-            android:backgroundTint="#1565C0"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            android:layout_marginBottom="8dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_potongan"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#C62828"
+                        android:layout_marginBottom="10dp"/>
 
-        <Button
-            android:id="@+id/btnExportSlip"
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:layout_gravity="center_horizontal"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
-            android:text="@string/label_btn_export_slip"
-            android:backgroundTint="#6A1B9A"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:layout_marginBottom="24dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_keterlambatan" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvPotonganTerlambat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_minus_rp" android:textColor="#C62828"/>
+                    </LinearLayout>
 
+                    <LinearLayout android:id="@+id/layoutDetailTerlambat" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="#FFF8F8" android:padding="8dp" android:layout_marginBottom="8dp"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_alpha" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvPotonganAlpha" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_minus_rp" android:textColor="#C62828"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_bpjs_kesehatan" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvBpjsKesehatan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_minus_rp" android:textColor="#C62828"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_bpjs_tk" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvBpjsTk" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_minus_rp" android:textColor="#C62828"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="10dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_pph21" android:textColor="#555555"/>
+                        <TextView android:id="@+id/tvPph21" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_minus_rp" android:textColor="#C62828"/>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="8dp"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/label_total_potongan" android:textStyle="bold" android:textColor="#C62828"/>
+                        <TextView android:id="@+id/tvTotalPotongan" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_minus_rp" android:textStyle="bold" android:textColor="#C62828"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ============ GAJI BERSIH ============ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#0F3460">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_gaji_bersih"
+                        android:textColor="#99BFFF"
+                        android:textSize="14sp"
+                        android:letterSpacing="0.1"/>
+
+                    <TextView
+                        android:id="@+id/tvGajiBersih"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_rp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ============ TOMBOL ============ -->
+            <Button
+                android:id="@+id/btnInputGaji"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="@string/label_btn_input_gaji"
+                android:backgroundTint="#0F3460"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp"/>
+
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -81,42 +81,43 @@ public class GajiActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        spinnerBulan = findViewById(R.id.spinnerBulan);
-        spinnerTahun = findViewById(R.id.spinnerTahun);
-        spinnerKaryawan = findViewById(R.id.spinnerKaryawan);
+        spinnerBulan             = findViewById(R.id.spinnerBulan);
+        spinnerTahun             = findViewById(R.id.spinnerTahun);
+        spinnerKaryawan          = findViewById(R.id.spinnerKaryawan);
+        layoutSpinnerKaryawan    = findViewById(R.id.layoutSpinnerKaryawan);
+        btnCariGaji              = findViewById(R.id.btnCariGaji);
+        btnInputGaji             = findViewById(R.id.btnInputGaji);
+        progressBar              = findViewById(R.id.progressBar);
 
-        layoutSpinnerKaryawan = findViewById(R.id.layoutSpinnerKaryawan);
-        btnCariGaji = findViewById(R.id.btnCariGaji);
-        btnInputGaji = findViewById(R.id.btnInputGaji);
-        progressBar = findViewById(R.id.progressBar);
+        tvNamaKaryawan           = findViewById(R.id.tvNamaKaryawan);
+        tvJabatan                = findViewById(R.id.tvJabatan);
+        tvPeriode                = findViewById(R.id.tvPeriode);
 
-        tvNamaKaryawan = findViewById(R.id.tvNamaKaryawan);
-        tvJabatan = findViewById(R.id.tvJabatan);
-        tvPeriode = findViewById(R.id.tvPeriode);
+        tvGajiPokok              = findViewById(R.id.tvGajiPokok);
+        tvTunjanganTransport     = findViewById(R.id.tvTunjanganTransport);
+        tvTunjanganMakan         = findViewById(R.id.tvTunjanganMakan);
+        tvTunjanganJabatan       = findViewById(R.id.tvTunjanganJabatan);
+        tvUangLembur             = findViewById(R.id.tvUangLembur);
+        tvTotalPenghasilan       = findViewById(R.id.tvTotalPenghasilan);
 
-        tvGajiPokok = findViewById(R.id.tvGajiPokok);
-        tvTunjanganTransport = findViewById(R.id.tvTunjanganTransport);
-        tvTunjanganMakan = findViewById(R.id.tvTunjanganMakan);
-        tvTunjanganJabatan = findViewById(R.id.tvTunjanganJabatan);
-        tvUangLembur = findViewById(R.id.tvUangLembur);
-        tvTotalPenghasilan = findViewById(R.id.tvTotalPenghasilan);
+        tvPotonganTerlambat      = findViewById(R.id.tvPotonganTerlambat);
+        tvPotonganAlpha          = findViewById(R.id.tvPotonganAlpha);
+        tvBpjsKesehatan          = findViewById(R.id.tvBpjsKesehatan);
+        tvBpjsTk                 = findViewById(R.id.tvBpjsTk);
+        tvPph21                  = findViewById(R.id.tvPph21);
+        tvTotalPotongan          = findViewById(R.id.tvTotalPotongan);
 
-        tvPotonganTerlambat = findViewById(R.id.tvPotonganTerlambat);
-        tvPotonganAlpha = findViewById(R.id.tvPotonganAlpha);
-        tvBpjsKesehatan = findViewById(R.id.tvBpjsKesehatan);
-        tvBpjsTk = findViewById(R.id.tvBpjsTk);
-        tvPph21 = findViewById(R.id.tvPph21);
-        tvTotalPotongan = findViewById(R.id.tvTotalPotongan);
-
-        tvGajiBersih = findViewById(R.id.tvGajiBersih);
+        tvGajiBersih             = findViewById(R.id.tvGajiBersih);
     }
 
     private void setupSpinner() {
-        spinnerBulan.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, BULAN));
+        spinnerBulan.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, BULAN));
 
         int tahunNow = Calendar.getInstance().get(Calendar.YEAR);
         String[] tahunList = {String.valueOf(tahunNow), String.valueOf(tahunNow - 1)};
-        spinnerTahun.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tahunList));
+        spinnerTahun.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, tahunList));
     }
 
     private void setupListener() {
@@ -135,6 +136,18 @@ public class GajiActivity extends AppCompatActivity {
         btnInputGaji.setOnClickListener(v ->
                 startActivity(new Intent(this, SetGajiActivity.class))
         );
+
+        spinnerKaryawan.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!karyawanList.isEmpty()) {
+                    selectedKaryawanId = karyawanList.get(position).id;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
     }
 
     private void loadKaryawanList() {
@@ -142,7 +155,8 @@ public class GajiActivity extends AppCompatActivity {
 
         api.getKaryawanList().enqueue(new Callback<KaryawanListResponse>() {
             @Override
-            public void onResponse(Call<KaryawanListResponse> call, Response<KaryawanListResponse> response) {
+            public void onResponse(Call<KaryawanListResponse> call,
+                                   Response<KaryawanListResponse> response) {
                 progressBar.setVisibility(View.GONE);
 
                 if (!response.isSuccessful() || response.body() == null) return;
@@ -181,14 +195,15 @@ public class GajiActivity extends AppCompatActivity {
         api.getGaji(selectedKaryawanId, bulan, tahun)
                 .enqueue(new Callback<GajiResponse>() {
                     @Override
-                    public void onResponse(Call<GajiResponse> call, Response<GajiResponse> response) {
+                    public void onResponse(Call<GajiResponse> call,
+                                           Response<GajiResponse> response) {
                         progressBar.setVisibility(View.GONE);
 
                         if (!response.isSuccessful() || response.body() == null) return;
 
                         GajiData d = response.body().data;
 
-                        // 🔥 SIMPAN KE SESSION (INI YANG MASUK KE PROFILE)
+                        // Simpan ke session (masuk ke profil)
                         session.simpanDataGaji(
                                 d.gaji_pokok,
                                 d.tunjangan_transport,
@@ -215,7 +230,19 @@ public class GajiActivity extends AppCompatActivity {
         tvPeriode.setText("Periode: " + d.periode);
 
         tvGajiPokok.setText(format(d.gaji_pokok));
+        tvTunjanganTransport.setText(format(d.tunjangan_transport));
+        tvTunjanganMakan.setText(format(d.tunjangan_makan));
+        tvTunjanganJabatan.setText(format(d.tunjangan_jabatan));
+        tvUangLembur.setText(format(d.uang_lembur));
         tvTotalPenghasilan.setText(format(d.total_penghasilan));
+
+        tvPotonganTerlambat.setText("- " + format(d.potongan_terlambat));
+        tvPotonganAlpha.setText("- " + format(d.potongan_alpha));
+        tvBpjsKesehatan.setText("- " + format(d.bpjs_kesehatan));
+        tvBpjsTk.setText("- " + format(d.bpjs_tk));
+        tvPph21.setText("- " + format(d.pph21));
+        tvTotalPotongan.setText("- " + format(d.total_potongan));
+
         tvGajiBersih.setText(format(d.gaji_bersih));
     }
 

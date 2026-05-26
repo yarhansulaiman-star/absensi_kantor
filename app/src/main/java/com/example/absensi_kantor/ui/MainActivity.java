@@ -1,6 +1,5 @@
 package com.example.absensi_kantor.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -28,6 +27,7 @@ import com.example.absensi_kantor.utils.DateUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -35,7 +35,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
     private SessionManager session;
@@ -46,12 +46,10 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // ── Status bar color (antisipasi deprecated) ────────────────
+        // ── Status bar color ─────────────────────────────────────
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             WindowInsetsController controller = getWindow().getInsetsController();
-            if (controller != null) {
-                controller.setSystemBarsAppearance(0, 0);
-            }
+            if (controller != null) controller.setSystemBarsAppearance(0, 0);
         } else {
             getWindow().setStatusBarColor(0xFF0F3460);
         }
@@ -59,12 +57,8 @@ public class MainActivity extends AppCompatActivity {
         View header = findViewById(R.id.headerLayout);
         ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
             int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-            v.setPadding(
-                    v.getPaddingLeft(),
-                    statusBarHeight + 16,
-                    v.getPaddingRight(),
-                    v.getPaddingBottom()
-            );
+            v.setPadding(v.getPaddingLeft(), statusBarHeight + 16,
+                    v.getPaddingRight(), v.getPaddingBottom());
             return insets;
         });
 
@@ -77,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         binding.labelWelcome.setText("Selamat datang, " + session.getUsername() + "!");
         binding.labelRole.setText("Role: " + session.getRole());
 
+        // ── Tampilkan menu Kelola Gaji hanya untuk HRD/admin ─────
         String role = session.getRole();
         if ("hrd".equals(role) || "admin".equals(role)) {
             binding.cardGaji.setVisibility(View.VISIBLE);
@@ -84,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             binding.cardGaji.setVisibility(View.GONE);
         }
 
-        // ── Listener menu ──────────────────────────────────────────
+        // ── Listener menu ────────────────────────────────────────
         binding.tombolAbsen.setOnClickListener(v ->
                 startActivity(new Intent(this, AbsenActivity.class)));
 
@@ -94,24 +89,26 @@ public class MainActivity extends AppCompatActivity {
         binding.tombolRiwayat.setOnClickListener(v ->
                 startActivity(new Intent(this, RiwayatActivity.class)));
 
-        binding.tombolExportPdf.setOnClickListener(v -> exportPdf());
+        // Export slip gaji (dipindah dari GajiActivity)
+        binding.tombolExportPdf.setOnClickListener(v -> exportSlipGaji());
 
         binding.tombolGaji.setOnClickListener(v ->
                 startActivity(new Intent(this, GajiActivity.class)));
 
-        // ── Surat Izin ──────────────────────────────────────────────
         binding.tombolSuratIzin.setOnClickListener(v ->
                 startActivity(new Intent(this, SuratIzinActivity.class)));
 
-        // ── Statistik ──────────────────────────────────────────────
         binding.tombolStatistik.setOnClickListener(v ->
                 startActivity(new Intent(this, DashboardStatistikActivity.class)));
 
-        // ── Bottom Navigation ───────────────────────────────────────
+        // ✅ Kalender — buka KalenderActivity
+        binding.tombolKalender.setOnClickListener(v ->
+                startActivity(new Intent(this, com.example.absensi_kantor.ui.KalenderActivity.class)));
+
+        // ── Bottom Navigation ────────────────────────────────────
         binding.bottomNav.setSelectedItemId(R.id.nav_home);
         binding.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-
             if (id == R.id.nav_home) {
                 return true;
             } else if (id == R.id.nav_riwayat) {
@@ -124,15 +121,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ProfilActivity.class));
                 return true;
             }
-
             return false;
         });
 
-        // ── Cek status absen hari ini ───────────────────────────────
+        // ── Cek status absen hari ini ────────────────────────────
         cekStatusAbsenHariIni();
     }
 
-    // ── Cek apakah sudah absen hari ini dari API ────────────────────
     private void cekStatusAbsenHariIni() {
         ApiClient.getService().riwayat().enqueue(new Callback<RiwayatResponse>() {
             @Override
@@ -146,51 +141,49 @@ public class MainActivity extends AppCompatActivity {
 
                 for (RiwayatResponse.DataRiwayat item : list) {
                     if (tanggalHariIni.equals(item.tanggal)) {
-
-                        // Ubah status jadi sudah absen
                         binding.tvStatusAbsen.setText("Sudah Absen");
-                        binding.tvStatusAbsen.setTextColor(0xFF4ADE80); // hijau
+                        binding.tvStatusAbsen.setTextColor(0xFF4ADE80);
 
-                        // Tampilkan jam masuk
                         if (item.jam_masuk != null) {
                             binding.tvJamAbsen.setVisibility(View.VISIBLE);
                             binding.tvJamAbsen.setText("Masuk: " + item.jam_masuk);
                         }
 
-                        // Nonaktifkan tombol absen supaya tidak bisa double absen
                         binding.tombolAbsen.setAlpha(0.5f);
                         binding.tombolAbsen.setClickable(false);
-
-                        return; // sudah ketemu, stop loop
+                        return;
                     }
                 }
-                // Tidak ketemu tanggal hari ini = belum absen, UI tetap default
             }
 
             @Override
             public void onFailure(Call<RiwayatResponse> call, Throwable t) {
-                // Gagal koneksi, biarkan status default "Belum Absen"
+                // Biarkan status default "Belum Absen"
             }
         });
     }
 
-    private void exportPdf() {
+    // Export slip gaji (dipindah dari GajiActivity)
+    private void exportSlipGaji() {
+        int userId = session.getUserId();
+        int bulan  = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        int tahun  = Calendar.getInstance().get(Calendar.YEAR);
+
         binding.tombolExportPdf.setEnabled(false);
-        Toast.makeText(this, "⏳ Mengunduh PDF...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "⏳ Mengunduh slip gaji...", Toast.LENGTH_SHORT).show();
 
-        String tanggal = DateUtils.getTanggalHariIni();
-
-        ApiClient.getService().laporanPdf(tanggal)
+        ApiClient.getService().exportSlipGaji(userId, bulan, tahun)
                 .enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call,
                                            Response<ResponseBody> response) {
                         binding.tombolExportPdf.setEnabled(true);
                         if (response.isSuccessful() && response.body() != null) {
-                            simpanPdf(response.body(), tanggal);
+                            String namaFile = "slip_gaji_" + bulan + "_" + tahun + ".pdf";
+                            simpanPdf(response.body(), namaFile);
                         } else {
                             Toast.makeText(MainActivity.this,
-                                    "Gagal download PDF!", Toast.LENGTH_SHORT).show();
+                                    "Gagal download slip gaji!", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -204,26 +197,24 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void simpanPdf(ResponseBody body, String tanggal) {
+    private void simpanPdf(ResponseBody body, String namaFile) {
         try {
             File dir  = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-            File file = new File(dir, "laporan_" + tanggal + ".pdf");
+            File file = new File(dir, namaFile);
 
-            InputStream is = body.byteStream();
+            InputStream is   = body.byteStream();
             FileOutputStream fos = new FileOutputStream(file);
             byte[] buffer = new byte[4096];
             int read;
 
-            while ((read = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, read);
-            }
+            while ((read = is.read(buffer)) != -1) fos.write(buffer, 0, read);
 
             fos.flush();
             fos.close();
             is.close();
 
             Toast.makeText(this,
-                    "✅ PDF disimpan:\n" + file.getAbsolutePath(),
+                    "✅ Slip gaji disimpan:\n" + file.getAbsolutePath(),
                     Toast.LENGTH_LONG).show();
 
         } catch (Exception e) {

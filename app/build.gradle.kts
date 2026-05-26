@@ -96,4 +96,7 @@ dependencies {
 
     implementation("androidx.core:core:1.12.0")
 
+    //background
+    implementation("com.airbnb.android:lottie:6.4.0")
+
 }

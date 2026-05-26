@@ -5,14 +5,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1565C0"
+    android:background="#0A1F3D"
     tools:context=".ui.auth.LoginActivity">
 
+    <!-- ══ BACKGROUND LOTTIE IKAN (fullscreen, looping) ══ -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieBackground"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:lottie_rawRes="@raw/office_worker"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        android:scaleType="fitCenter"
+        android:alpha="0.55" />
+
+    <!-- ══ OVERLAY GRADIENT (memberi kedalaman di atas animasi) ══ -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/bg_ocean" />
+
+    <!-- ══ SCROLL CONTAINER ══ -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
         android:overScrollMode="never"
+        android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,7 +48,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="640dp">
+            android:minHeight="640dp"
+            android:background="@android:color/transparent">
 
             <!-- ══ LOGO ══ -->
             <androidx.cardview.widget.CardView
@@ -30,8 +58,8 @@
                 android:layout_height="88dp"
                 android:layout_marginTop="72dp"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="12dp"
-                app:cardBackgroundColor="#FFFFFF"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#33FFFFFF"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
@@ -54,10 +82,14 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
                 android:text="Absensi Karyawan"
-                android:textSize="24sp"
+                android:textSize="26sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
                 android:gravity="center"
+                android:shadowColor="#66000000"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="6"
                 app:layout_constraintTop_toBottomOf="@id/cardLogo"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -71,23 +103,34 @@
                 android:layout_marginEnd="32dp"
                 android:text="Masuk untuk melanjutkan"
                 android:textSize="14sp"
-                android:textColor="#CCE3FF"
+                android:textColor="#CCFFFFFF"
                 android:gravity="center"
+                android:shadowColor="#66000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
                 app:layout_constraintTop_toBottomOf="@id/textJudul"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- ══ CARD FORM ══ -->
-            <androidx.cardview.widget.CardView
+            <!-- ══ CARD FORM (TRANSPARAN / GLASSMORPHISM) ══ -->
+            <!--
+                CardView tidak mendukung alpha pada background secara native,
+                gunakan MaterialCardView dengan cardBackgroundColor transparan
+                dan border tipis untuk efek kaca.
+            -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardLogin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#33FFFFFF"
+                app:strokeColor="#55FFFFFF"
+                app:strokeWidth="1dp"
                 app:layout_constraintTop_toBottomOf="@id/textSubjudul"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
@@ -99,15 +142,17 @@
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
                     android:paddingTop="28dp"
-                    android:paddingBottom="24dp">
+                    android:paddingBottom="24dp"
+                    android:background="@android:color/transparent">
 
+                    <!-- Judul form -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Selamat Datang 👋"
+                        android:text="Selamat Datang "
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="#1A237E"
+                        android:textColor="#FFFFFF"
                         android:layout_marginBottom="4dp" />
 
                     <TextView
@@ -115,11 +160,12 @@
                         android:layout_height="wrap_content"
                         android:text="Silakan masuk dengan akun Anda"
                         android:textSize="13sp"
-                        android:textColor="#9E9E9E"
+                        android:textColor="#CCFFFFFF"
                         android:layout_marginBottom="20dp" />
 
-                    <!-- Input Username -->
+                    <!-- Input Username (transparan, teks putih) -->
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layoutUsername"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -128,8 +174,10 @@
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxStrokeColor="#1976D2"
-                        app:hintTextColor="#1976D2">
+                        app:boxStrokeColor="#AAFFFFFF"
+                        app:boxBackgroundColor="#22FFFFFF"
+                        app:hintTextColor="#CCFFFFFF"
+                        app:startIconTint="#AAFFFFFF">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputUsername"
@@ -137,24 +185,30 @@
                             android:layout_height="wrap_content"
                             android:imeOptions="actionNext"
                             android:inputType="text"
-                            android:maxLines="1" />
+                            android:maxLines="1"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#88FFFFFF"
+                            android:background="@android:color/transparent" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Input Password -->
+                    <!-- Input Password (transparan, teks putih) -->
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layoutPassword"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
                         android:hint="Password"
                         app:passwordToggleEnabled="true"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:passwordToggleTint="#AAFFFFFF"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxStrokeColor="#1976D2"
-                        app:hintTextColor="#1976D2">
+                        app:boxStrokeColor="#AAFFFFFF"
+                        app:boxBackgroundColor="#22FFFFFF"
+                        app:hintTextColor="#CCFFFFFF">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputPassword"
@@ -162,26 +216,29 @@
                             android:layout_height="wrap_content"
                             android:inputType="textPassword"
                             android:imeOptions="actionDone"
-                            android:maxLines="1" />
+                            android:maxLines="1"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#88FFFFFF"
+                            android:background="@android:color/transparent" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Label Error — pakai background warna langsung, no drawable -->
+                    <!-- Label Error (transparan merah) -->
                     <TextView
                         android:id="@+id/labelError"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:padding="10dp"
-                        android:background="#FFEBEE"
+                        android:background="#44FF1744"
                         android:textSize="13sp"
-                        android:textColor="#C62828"
+                        android:textColor="#FFCDD2"
                         android:gravity="center"
                         android:visibility="gone"
                         tools:text="Username atau password salah!" />
 
-                    <!-- Tombol Login -->
-                    <Button
+                    <!-- Tombol MASUK -->
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/tombolLogin"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
@@ -189,8 +246,10 @@
                         android:text="MASUK"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        android:backgroundTint="#1565C0"
-                        app:cornerRadius="12dp" />
+                        android:textColor="#0A1F3D"
+                        app:backgroundTint="#E0F7FF"
+                        app:cornerRadius="12dp"
+                        app:rippleColor="#220F3460" />
 
                     <!-- Divider -->
                     <LinearLayout
@@ -205,51 +264,55 @@
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_weight="1"
-                            android:background="#E0E0E0" />
+                            android:background="#55FFFFFF" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="  atau  "
                             android:textSize="12sp"
-                            android:textColor="#BDBDBD" />
+                            android:textColor="#AAFFFFFF" />
 
                         <View
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_weight="1"
-                            android:background="#E0E0E0" />
+                            android:background="#55FFFFFF" />
 
                     </LinearLayout>
 
-                    <!-- Tombol Register -->
-                    <Button
+                    <!-- Tombol Daftar -->
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/tombolRegister"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:layout_marginTop="4dp"
                         android:text="DAFTAR AKUN BARU"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="#1565C0"
-                        android:backgroundTint="#E3F2FD"
-                        app:cornerRadius="12dp" />
+                        android:textColor="#FFFFFF"
+                        app:strokeColor="#AAFFFFFF"
+                        app:strokeWidth="1.5dp"
+                        app:cornerRadius="12dp"
+                        app:rippleColor="#22FFFFFF" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Progress Bar -->
+            <!-- ══ PROGRESS BAR ══ -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:indeterminateTint="#FFFFFF"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/cardLogin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Footer -->
+            <!-- ══ FOOTER ══ -->
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -257,9 +320,9 @@
                 android:layout_marginBottom="32dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
-                android:text="© 2025 Sistem Absensi Karyawan"
+                android:text="© 2026 Sistem Absensi Karyawan"
                 android:textSize="11sp"
-                android:textColor="#90CAF9"
+                android:textColor="#88FFFFFF"
                 android:gravity="center"
                 app:layout_constraintTop_toBottomOf="@id/progressBar"
                 app:layout_constraintStart_toStartOf="parent"

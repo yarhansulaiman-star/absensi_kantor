@@ -1,105 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F6FA">
+    android:background="#F0F4FF">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#1A1A2E"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="20dp">
+        android:paddingBottom="56dp">
 
-        <TextView
+        <!-- Header -->
+        <LinearLayout
+            android:id="@+id/layoutHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#0F3460"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋 Laporan Absensi"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"/>
+
+            <TextView
+                android:id="@+id/labelTanggal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="📅 -"
+                android:textSize="13sp"
+                android:textColor="#99BFFF"/>
+
+            <TextView
+                android:id="@+id/labelTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Total Hadir: 0 orang"
+                android:textSize="13sp"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
+
+        <!-- Tombol Refresh & Kembali -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/tombolKembali"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="← Kembali"
+                android:textSize="13sp"
+                android:backgroundTint="#1A2A4A"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/tombolRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔄 Refresh"
+                android:textSize="13sp"
+                android:backgroundTint="#0F3460"/>
+
+        </LinearLayout>
+
+        <!-- ProgressBar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📋 Laporan Absensi"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="40dp"/>
 
+        <!-- Label kosong -->
         <TextView
-            android:id="@+id/labelTanggal"
-            android:layout_width="wrap_content"
+            android:id="@+id/labelKosong"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="📅 -"
-            android:textSize="13sp"
-            android:textColor="#AAAACC" />
+            android:layout_marginTop="60dp"
+            android:gravity="center"
+            android:text="😔 Belum ada data absensi hari ini"
+            android:textSize="15sp"
+            android:textColor="#AAAAAA"
+            android:visibility="gone"/>
 
-        <TextView
-            android:id="@+id/labelTotal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Total Hadir: 0 orang"
-            android:textSize="13sp"
-            android:textColor="#FFFFFF" />
+        <!-- List Laporan -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerLaporan"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false"
+            android:visibility="gone"/>
 
     </LinearLayout>
 
-    <!-- Tombol Refresh & Kembali -->
-    <LinearLayout
+    <!-- BOTTOM NAV BAR -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="end">
+        android:layout_gravity="bottom"
+        android:background="#FFFFFF"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:elevation="8dp"/>
 
-        <Button
-            android:id="@+id/tombolKembali"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="← Kembali"
-            android:textSize="13sp"
-            android:backgroundTint="#AAAAAA"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/tombolRefresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🔄 Refresh"
-            android:textSize="13sp"
-            android:backgroundTint="#1A1A2E" />
-
-    </LinearLayout>
-
-    <!-- ProgressBar -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        android:layout_marginTop="40dp" />
-
-    <!-- Label kosong -->
-    <TextView
-        android:id="@+id/labelKosong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:gravity="center"
-        android:text="😔 Belum ada data absensi hari ini"
-        android:textSize="15sp"
-        android:textColor="#AAAAAA"
-        android:visibility="gone" />
-
-    <!-- List Laporan -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerLaporan"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingBottom="16dp"
-        android:clipToPadding="false"
-        android:visibility="gone" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

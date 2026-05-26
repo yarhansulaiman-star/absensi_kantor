@@ -12,17 +12,18 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
-
 import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.ApiService;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.model.absen.RiwayatResponse;
 import com.example.absensi_kantor.model.gaji.GajiResponse;
-
+import com.example.absensi_kantor.ui.MainActivity;
+import com.example.absensi_kantor.ui.laporan.LaporanActivity;
+import com.example.absensi_kantor.ui.laporan.RiwayatActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Calendar;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,22 +35,11 @@ public class ProfilActivity extends AppCompatActivity {
     private SessionManager session;
     private ApiService     api;
 
-    // Views — Akun
     private TextView txtAvatar, txtUsername, txtRole, txtUserId;
-
-    // Views — Statistik
     private TextView txtStatHadir, txtStatTerlambat, txtStatIzin;
-
-    // Views — Gaji
     private TextView txtGajiPokok, txtTunjangan, txtTotalPenghasilan;
-
-    // Views — Pengaturan
     private SwitchCompat switchDarkMode;
-
-    // Views — Versi
     private TextView txtVersi;
-
-    // Views — Aksi
     private Button btnGantiPassword, btnTentang, btnLogout;
 
     @Override
@@ -58,7 +48,6 @@ public class ProfilActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
-        // Terapkan dark mode SEBELUM setContentView
         if (session.isDarkMode()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
@@ -81,9 +70,33 @@ public class ProfilActivity extends AppCompatActivity {
         loadVersi();
         loadStatistik();
         setupListeners();
+
+        // ── Bottom Navigation ───────────────────────────────────────
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.nav_profil);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_riwayat) {
+                startActivity(new Intent(this, RiwayatActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_laporan) {
+                startActivity(new Intent(this, LaporanActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_profil) {
+                return true; // sudah di halaman ini
+            }
+
+            return false;
+        });
     }
 
-    // ===================== INIT =====================
     private void initViews() {
         txtAvatar   = findViewById(R.id.txtAvatar);
         txtUsername = findViewById(R.id.txtUsername);
@@ -99,15 +112,13 @@ public class ProfilActivity extends AppCompatActivity {
         txtTotalPenghasilan = findViewById(R.id.txtTotalPenghasilan);
 
         switchDarkMode = findViewById(R.id.switchDarkMode);
-
-        txtVersi = findViewById(R.id.txtVersi);
+        txtVersi       = findViewById(R.id.txtVersi);
 
         btnGantiPassword = findViewById(R.id.btnGantiPassword);
         btnTentang       = findViewById(R.id.btnTentang);
         btnLogout        = findViewById(R.id.btnLogout);
     }
 
-    // ===================== LOAD DATA AKUN =====================
     private void loadAkun() {
         String username = session.getUsername();
         String inisial  = (username != null && !username.isEmpty())
@@ -122,7 +133,6 @@ public class ProfilActivity extends AppCompatActivity {
         switchDarkMode.setChecked(session.isDarkMode());
     }
 
-    // ===================== LOAD DATA GAJI =====================
     private void loadGaji() {
         txtGajiPokok.setText("Gaji Pokok          : Rp " + formatRupiah(session.getGajiPokok()));
         txtTunjangan.setText("Total Tunjangan  : Rp " + formatRupiah(session.getTotalTunjangan()));
@@ -133,7 +143,6 @@ public class ProfilActivity extends AppCompatActivity {
         int tahun      = cal.get(Calendar.YEAR);
         int karyawanId = session.getKaryawanId();
 
-        // ✅ Debug — cek nilai sebelum request
         Log.d(TAG, "loadGaji → karyawanId=" + karyawanId
                 + ", bulan=" + bulan + ", tahun=" + tahun);
 
@@ -200,7 +209,6 @@ public class ProfilActivity extends AppCompatActivity {
                 });
     }
 
-    // ===================== LOAD VERSI APLIKASI =====================
     private void loadVersi() {
         try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -210,7 +218,6 @@ public class ProfilActivity extends AppCompatActivity {
         }
     }
 
-    // ===================== LOAD STATISTIK ABSENSI =====================
     private void loadStatistik() {
         txtStatHadir.setText("-");
         txtStatTerlambat.setText("-");
@@ -260,9 +267,7 @@ public class ProfilActivity extends AppCompatActivity {
         });
     }
 
-    // ===================== SETUP LISTENERS =====================
     private void setupListeners() {
-
         switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             session.setDarkMode(isChecked);
             AppCompatDelegate.setDefaultNightMode(
@@ -272,7 +277,6 @@ public class ProfilActivity extends AppCompatActivity {
         });
 
         btnGantiPassword.setOnClickListener(v -> showGantiPasswordDialog());
-
         btnTentang.setOnClickListener(v -> showTentangDialog());
 
         btnLogout.setOnClickListener(v ->
@@ -293,7 +297,6 @@ public class ProfilActivity extends AppCompatActivity {
         );
     }
 
-    // ===================== DIALOG GANTI PASSWORD =====================
     private void showGantiPasswordDialog() {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -347,7 +350,6 @@ public class ProfilActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ===================== DIALOG TENTANG APLIKASI =====================
     private void showTentangDialog() {
         String versi;
         try {
@@ -371,7 +373,6 @@ public class ProfilActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ===================== FORMAT RUPIAH =====================
     private String formatRupiah(long nominal) {
         String str = String.valueOf(nominal);
         StringBuilder sb = new StringBuilder();

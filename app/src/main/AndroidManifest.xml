@@ -48,6 +48,7 @@
         <activity android:name=".ui.auth.ProfilActivity"             android:exported="false" />
         <activity android:name=".ui.izin.SuratIzinActivity"          android:label="Surat Izin" />
         <activity android:name=".ui.izin.ApproveSuratIzinActivity"   android:label="Kelola Surat Izin" />
+        <activity android:name=".ui.KalenderActivity"                  android:exported="false" />
         <activity
             android:name=".ui.DashboardStatistikActivity"
             android:label="Statistik Kehadiran"

@@ -1,6 +1,9 @@
 package com.example.absensi_kantor.ui.laporan;
 
+import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
@@ -13,6 +16,9 @@ import android.widget.Toast;
 import com.example.absensi_kantor.R;
 import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.model.absen.RiwayatResponse;
+import com.example.absensi_kantor.ui.MainActivity;
+import com.example.absensi_kantor.ui.auth.ProfilActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,7 +35,6 @@ public class RiwayatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_riwayat);
 
-        //  Init ApiClient agar token otomatis diinject
         ApiClient.init(this);
 
         recyclerView = findViewById(R.id.recyclerRiwayat);
@@ -37,14 +42,47 @@ public class RiwayatActivity extends AppCompatActivity {
         labelKosong  = findViewById(R.id.labelKosong);
         labelNama    = findViewById(R.id.labelNama);
 
-        findViewById(R.id.tombolKembali).setOnClickListener(v -> finish());
+        // ── Sesuaikan posisi judul dengan status bar HP nyata ──────────
+        ViewCompat.setOnApplyWindowInsetsListener(
+                findViewById(android.R.id.content), (v, insets) -> {
+                    int statusBarHeight = insets.getInsets(
+                            WindowInsetsCompat.Type.statusBars()).top;
+                    findViewById(R.id.textJudul).setPadding(0, statusBarHeight + 16, 0, 0);
+                    return insets;
+                }
+        );
+
         muatRiwayat();
+
+        // ── Bottom Navigation ───────────────────────────────────────
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.nav_riwayat);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_riwayat) {
+                return true;
+            } else if (id == R.id.nav_laporan) {
+                startActivity(new Intent(this, LaporanActivity.class));
+                finish();
+                return true;
+            } else if (id == R.id.nav_profil) {
+                startActivity(new Intent(this, ProfilActivity.class));
+                finish();
+                return true;
+            }
+
+            return false;
+        });
     }
 
     private void muatRiwayat() {
         progressBar.setVisibility(View.VISIBLE);
 
-        //  Hapus session.getToken() — token sudah otomatis dari interceptor
         ApiClient.getService().riwayat()
                 .enqueue(new Callback<RiwayatResponse>() {
                     @Override

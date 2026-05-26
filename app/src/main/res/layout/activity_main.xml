@@ -37,9 +37,7 @@
             android:orientation="vertical"
             android:paddingBottom="88dp">
 
-            <!-- ═══════════════════════════════════════════════════
-                 HEADER — dark navy gradient background
-                 ═══════════════════════════════════════════════════ -->
+            <!-- ═══════════════════ HEADER ═══════════════════════ -->
             <LinearLayout
                 android:id="@+id/headerLayout"
                 android:layout_width="match_parent"
@@ -51,7 +49,6 @@
                 android:paddingTop="16dp"
                 android:paddingBottom="28dp">
 
-                <!-- Row: Avatar + Name + Role badge -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -59,7 +56,6 @@
                     android:gravity="center_vertical"
                     android:layout_marginBottom="16dp">
 
-                    <!-- Avatar circle -->
                     <FrameLayout
                         android:layout_width="44dp"
                         android:layout_height="44dp">
@@ -73,7 +69,6 @@
                             android:contentDescription="Avatar"/>
                     </FrameLayout>
 
-                    <!-- Name + greeting -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -96,10 +91,8 @@
                             android:textStyle="bold"
                             android:textColor="#FFFFFF"
                             tools:text="Selamat datang, Yarhan!"/>
-
                     </LinearLayout>
 
-                    <!-- Role badge -->
                     <TextView
                         android:id="@+id/labelRole"
                         android:layout_width="wrap_content"
@@ -112,7 +105,6 @@
                         android:textSize="10sp"
                         android:textColor="#CCDDFF"
                         tools:text="● user"/>
-
                 </LinearLayout>
 
                 <!-- Status card -->
@@ -161,7 +153,6 @@
                                 android:textColor="#7799CC"
                                 android:layout_marginTop="2dp"
                                 android:visibility="gone"/>
-
                         </LinearLayout>
 
                         <LinearLayout
@@ -185,17 +176,13 @@
                                 android:textStyle="bold"
                                 android:textColor="#FFFFFF"
                                 android:layout_marginTop="2dp"/>
-
                         </LinearLayout>
-
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
-            <!-- ═══════════════════════════════════════════════════
-                 CONTENT AREA
-                 ═══════════════════════════════════════════════════ -->
+            <!-- ═══════════════════ CONTENT ══════════════════════ -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -204,7 +191,7 @@
                 android:paddingEnd="16dp"
                 android:paddingTop="16dp">
 
-                <!-- ── TOMBOL ABSEN UTAMA (CTA) ──────────────────── -->
+                <!-- ── TOMBOL ABSEN UTAMA ────────────────────────── -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -225,7 +212,6 @@
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
 
-                        <!-- Icon box -->
                         <FrameLayout
                             android:layout_width="38dp"
                             android:layout_height="38dp"
@@ -261,7 +247,6 @@
                                 android:textSize="11sp"
                                 android:textColor="#99BFFF"
                                 android:layout_marginTop="1dp"/>
-
                         </LinearLayout>
 
                         <TextView
@@ -270,7 +255,6 @@
                             android:text="›"
                             android:textSize="22sp"
                             android:textColor="#99BFFF"/>
-
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -285,14 +269,13 @@
                     android:layout_marginBottom="10dp"
                     android:layout_marginStart="2dp"/>
 
-                <!-- ── GRID MENU ROW 1: Laporan + Statistik ──────── -->
+                <!-- ── ROW 1: Laporan + Statistik ───────────────── -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="10dp">
 
-                    <!-- Laporan -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="0dp"
                         android:layout_height="100dp"
@@ -301,7 +284,6 @@
                         app:cardCornerRadius="14dp"
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
-
                         <LinearLayout
                             android:id="@+id/tombolLaporan"
                             android:layout_width="match_parent"
@@ -314,40 +296,22 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground">
-
-                            <FrameLayout
-                                android:layout_width="34dp"
-                                android:layout_height="34dp"
+                            <FrameLayout android:layout_width="34dp" android:layout_height="34dp"
                                 android:background="@drawable/icon_box_purple">
-                                <ImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
+                                <ImageView android:layout_width="18dp" android:layout_height="18dp"
                                     android:layout_gravity="center"
                                     android:src="@android:drawable/ic_menu_agenda"
                                     app:tint="#7C4DFF"/>
                             </FrameLayout>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Laporan"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="#1A1A2E"
-                                android:layout_marginTop="8dp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Lihat rekap"
-                                android:textSize="10sp"
-                                android:textColor="#9E9E9E"
-                                android:layout_marginTop="1dp"/>
-
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Laporan" android:textSize="12sp" android:textStyle="bold"
+                                android:textColor="#1A1A2E" android:layout_marginTop="8dp"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Lihat rekap" android:textSize="10sp"
+                                android:textColor="#9E9E9E" android:layout_marginTop="1dp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Statistik -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="0dp"
                         android:layout_height="100dp"
@@ -355,7 +319,6 @@
                         app:cardCornerRadius="14dp"
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
-
                         <LinearLayout
                             android:id="@+id/tombolStatistik"
                             android:layout_width="match_parent"
@@ -368,49 +331,30 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground">
-
-                            <FrameLayout
-                                android:layout_width="34dp"
-                                android:layout_height="34dp"
+                            <FrameLayout android:layout_width="34dp" android:layout_height="34dp"
                                 android:background="@drawable/icon_box_green">
-                                <ImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
+                                <ImageView android:layout_width="18dp" android:layout_height="18dp"
                                     android:layout_gravity="center"
                                     android:src="@android:drawable/ic_menu_sort_by_size"
                                     app:tint="#2E7D32"/>
                             </FrameLayout>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Statistik"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="#1A1A2E"
-                                android:layout_marginTop="8dp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Grafik bulanan"
-                                android:textSize="10sp"
-                                android:textColor="#9E9E9E"
-                                android:layout_marginTop="1dp"/>
-
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Statistik" android:textSize="12sp" android:textStyle="bold"
+                                android:textColor="#1A1A2E" android:layout_marginTop="8dp"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Grafik bulanan" android:textSize="10sp"
+                                android:textColor="#9E9E9E" android:layout_marginTop="1dp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
-
                 </LinearLayout>
 
-                <!-- ── GRID MENU ROW 2: Riwayat + Export PDF ─────── -->
+                <!-- ── ROW 2: Riwayat + Export PDF ──────────────── -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="16dp">
 
-                    <!-- Riwayat -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="0dp"
                         android:layout_height="100dp"
@@ -419,7 +363,6 @@
                         app:cardCornerRadius="14dp"
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
-
                         <LinearLayout
                             android:id="@+id/tombolRiwayat"
                             android:layout_width="match_parent"
@@ -432,40 +375,22 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground">
-
-                            <FrameLayout
-                                android:layout_width="34dp"
-                                android:layout_height="34dp"
+                            <FrameLayout android:layout_width="34dp" android:layout_height="34dp"
                                 android:background="@drawable/icon_box_orange">
-                                <ImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
+                                <ImageView android:layout_width="18dp" android:layout_height="18dp"
                                     android:layout_gravity="center"
                                     android:src="@android:drawable/ic_menu_recent_history"
                                     app:tint="#E65100"/>
                             </FrameLayout>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Riwayat"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="#1A1A2E"
-                                android:layout_marginTop="8dp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="History absen"
-                                android:textSize="10sp"
-                                android:textColor="#9E9E9E"
-                                android:layout_marginTop="1dp"/>
-
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Riwayat" android:textSize="12sp" android:textStyle="bold"
+                                android:textColor="#1A1A2E" android:layout_marginTop="8dp"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="History absen" android:textSize="10sp"
+                                android:textColor="#9E9E9E" android:layout_marginTop="1dp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Export PDF -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="0dp"
                         android:layout_height="100dp"
@@ -473,7 +398,6 @@
                         app:cardCornerRadius="14dp"
                         app:cardElevation="1dp"
                         app:cardBackgroundColor="#FFFFFF">
-
                         <LinearLayout
                             android:id="@+id/tombolExportPdf"
                             android:layout_width="match_parent"
@@ -486,42 +410,24 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?attr/selectableItemBackground">
-
-                            <FrameLayout
-                                android:layout_width="34dp"
-                                android:layout_height="34dp"
+                            <FrameLayout android:layout_width="34dp" android:layout_height="34dp"
                                 android:background="@drawable/icon_box_red">
-                                <ImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
+                                <ImageView android:layout_width="18dp" android:layout_height="18dp"
                                     android:layout_gravity="center"
                                     android:src="@android:drawable/ic_menu_save"
                                     app:tint="#C62828"/>
                             </FrameLayout>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Export PDF"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="#1A1A2E"
-                                android:layout_marginTop="8dp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Unduh laporan"
-                                android:textSize="10sp"
-                                android:textColor="#9E9E9E"
-                                android:layout_marginTop="1dp"/>
-
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Export PDF" android:textSize="12sp" android:textStyle="bold"
+                                android:textColor="#1A1A2E" android:layout_marginTop="8dp"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Unduh laporan" android:textSize="10sp"
+                                android:textColor="#9E9E9E" android:layout_marginTop="1dp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
-
                 </LinearLayout>
 
-                <!-- ── SURAT IZIN (row card) ──────────────────────── -->
+                <!-- ── SURAT IZIN ─────────────────────────────────── -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardSuratIzin"
                     android:layout_width="match_parent"
@@ -530,7 +436,6 @@
                     app:cardCornerRadius="14dp"
                     app:cardElevation="1dp"
                     app:cardBackgroundColor="#FFFFFF">
-
                     <LinearLayout
                         android:id="@+id/tombolSuratIzin"
                         android:layout_width="match_parent"
@@ -542,55 +447,71 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
-
-                        <FrameLayout
-                            android:layout_width="34dp"
-                            android:layout_height="34dp"
+                        <FrameLayout android:layout_width="34dp" android:layout_height="34dp"
                             android:background="@drawable/icon_box_blue">
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
                                 android:layout_gravity="center"
                                 android:src="@android:drawable/ic_menu_edit"
                                 app:tint="#1565C0"/>
                         </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical"
                             android:layout_marginStart="14dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Surat Izin"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Surat Izin" android:textSize="13sp" android:textStyle="bold"
                                 android:textColor="#1A1A2E"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Ajukan &amp; lihat surat izin"
-                                android:textSize="11sp"
-                                android:textColor="#9E9E9E"
-                                android:layout_marginTop="1dp"/>
-
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Ajukan &amp; lihat surat izin" android:textSize="11sp"
+                                android:textColor="#9E9E9E" android:layout_marginTop="1dp"/>
                         </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="›"
-                            android:textSize="20sp"
-                            android:textColor="#CCCCCC"/>
-
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="›" android:textSize="20sp" android:textColor="#CCCCCC"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- ── KELOLA GAJI — hanya HRD/Admin (visibility dikontrol Java) ── -->
+                <!-- ✅ KALENDER ──────────────────────────────────── -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardKalender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="1dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:id="@+id/tombolKalender"
+                        android:layout_width="match_parent"
+                        android:layout_height="68dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+                        <FrameLayout android:layout_width="34dp" android:layout_height="34dp"
+                            android:background="@drawable/icon_box_green">
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_today"
+                                app:tint="#2E7D32"/>
+                        </FrameLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Kalender" android:textSize="13sp" android:textStyle="bold"
+                                android:textColor="#1A1A2E"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Lihat kehadiran bulanan" android:textSize="11sp"
+                                android:textColor="#9E9E9E" android:layout_marginTop="1dp"/>
+                        </LinearLayout>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="›" android:textSize="20sp" android:textColor="#CCCCCC"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- ── KELOLA GAJI (HRD/Admin only) ─────────────── -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardGaji"
                     android:layout_width="match_parent"
@@ -600,7 +521,6 @@
                     app:cardCornerRadius="14dp"
                     app:cardElevation="1dp"
                     app:cardBackgroundColor="#FFFFFF">
-
                     <LinearLayout
                         android:id="@+id/tombolGaji"
                         android:layout_width="match_parent"
@@ -612,51 +532,25 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
-
-                        <FrameLayout
-                            android:layout_width="34dp"
-                            android:layout_height="34dp"
+                        <FrameLayout android:layout_width="34dp" android:layout_height="34dp"
                             android:background="@drawable/icon_box_navy">
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
                                 android:layout_gravity="center"
                                 android:src="@android:drawable/ic_menu_manage"
                                 app:tint="#0F3460"/>
                         </FrameLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical"
                             android:layout_marginStart="14dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Kelola Gaji"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Kelola Gaji" android:textSize="13sp" android:textStyle="bold"
                                 android:textColor="#1A1A2E"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Input &amp; lihat data gaji karyawan"
-                                android:textSize="11sp"
-                                android:textColor="#9E9E9E"
-                                android:layout_marginTop="1dp"/>
-
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Input &amp; lihat data gaji karyawan" android:textSize="11sp"
+                                android:textColor="#9E9E9E" android:layout_marginTop="1dp"/>
                         </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="›"
-                            android:textSize="20sp"
-                            android:textColor="#CCCCCC"/>
-
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="›" android:textSize="20sp" android:textColor="#CCCCCC"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

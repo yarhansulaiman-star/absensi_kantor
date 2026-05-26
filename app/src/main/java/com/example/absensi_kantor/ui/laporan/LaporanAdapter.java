@@ -32,13 +32,12 @@ public class LaporanAdapter extends RecyclerView.Adapter<LaporanAdapter.ViewHold
 
         holder.textNama.setText(item.nama != null ? item.nama : "-");
         holder.textJabatan.setText(
-                (item.jabatan != null ? item.jabatan : "-") +
+                (item.jabatan    != null ? item.jabatan    : "-") +
                         " - " +
                         (item.departemen != null ? item.departemen : "-"));
         holder.textMasuk.setText("Masuk  : " + (item.jam_masuk  != null ? item.jam_masuk  : "-"));
         holder.textKeluar.setText("Keluar : " + (item.jam_keluar != null ? item.jam_keluar : "-"));
 
-        // Warna status terlambat vs hadir
         String status = item.status != null ? item.status : "-";
         holder.textStatus.setText(status);
         if ("terlambat".equalsIgnoreCase(status)) {
@@ -47,7 +46,6 @@ public class LaporanAdapter extends RecyclerView.Adapter<LaporanAdapter.ViewHold
             holder.textStatus.setBackgroundResource(R.drawable.bg_status);
         }
 
-        // Tampilkan alamat lokasi
         if (holder.textAlamat != null) {
             String alamat = item.alamat != null && !item.alamat.isEmpty()
                     ? item.alamat : "Lokasi tidak tersedia";
@@ -68,7 +66,7 @@ public class LaporanAdapter extends RecyclerView.Adapter<LaporanAdapter.ViewHold
             textMasuk   = itemView.findViewById(R.id.textMasuk);
             textKeluar  = itemView.findViewById(R.id.textKeluar);
             textStatus  = itemView.findViewById(R.id.textStatus);
-            textAlamat  = itemView.findViewById(R.id.textAlamat); // null-safe di onBindViewHolder
+            textAlamat  = itemView.findViewById(R.id.textAlamat);
         }
     }
 }

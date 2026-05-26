@@ -89,21 +89,11 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d(TAG, "sukses=" + res.sukses + ", role=" + res.role);
 
                     if (res.sukses) {
-                        // ✅ Simpan session
+                        // ✅ Simpan session (tidak duplikat)
                         session.simpanSession(res.token, res.username, res.role, res.userId);
                         session.simpanKaryawanId(res.karyawanId);
-                        if (res.sukses) {
-                            session.simpanSession(res.token, res.username, res.role, res.userId);
-                            session.simpanKaryawanId(res.karyawanId);
 
-                            // ✅ Debug paksa — cek apakah tersimpan
-                            Log.d(TAG, "=== DEBUG LOGIN ===");
-                            Log.d(TAG, "res.karyawanId = " + res.karyawanId);
-                            Log.d(TAG, "res.gajiPokok = " + res.gajiPokok);
-                            Log.d(TAG, "session.getKaryawanId() = " + session.getKaryawanId());
-                            Log.d(TAG, "session.getGajiPokok() = " + session.getGajiPokok());
-                            Log.d(TAG, "==================");
-                        }
+                        // ✅ Simpan data gaji dari response login
                         long tarifTerlambat = res.tarifTerlambat > 0
                                 ? (long) res.tarifTerlambat : 1000;
                         long tarifAlpha     = res.tarifAlpha > 0
@@ -118,6 +108,14 @@ public class LoginActivity extends AppCompatActivity {
                                 tarifAlpha
                         );
 
+                        // ✅ Debug log — verifikasi data tersimpan benar
+                        Log.d(TAG, "=== DEBUG LOGIN ===");
+                        Log.d(TAG, "res.karyawanId      = " + res.karyawanId);
+                        Log.d(TAG, "res.gajiPokok       = " + res.gajiPokok);
+                        Log.d(TAG, "session.karyawanId  = " + session.getKaryawanId());
+                        Log.d(TAG, "session.gajiPokok   = " + session.getGajiPokok());
+                        Log.d(TAG, "==================");
+
                         Log.d(TAG, "Gaji tersimpan → pokok=" + (long) res.gajiPokok
                                 + ", transport=" + (long) res.tunjanganTransport
                                 + ", makan="     + (long) res.tunjanganMakan
@@ -126,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                         // Jadwalkan alarm absen
                         AlarmScheduler.jadwalkanPengingatAbsen(LoginActivity.this);
 
-                        // Ambil FCM Token lalu buka MainActivity di dalamnya
+                        // Ambil FCM Token lalu buka MainActivity
                         ambilFcmToken();
 
                     } else {
@@ -178,11 +176,12 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                     @Override
                                     public void onFailure(Call<Void> call, Throwable t) {
-                                        Log.e(TAG, "Gagal: " + t.getMessage());
+                                        Log.e(TAG, "Gagal kirim FCM token: " + t.getMessage());
                                         bukaMainActivity();
                                     }
                                 });
                     } else {
+                        Log.e(TAG, "Gagal ambil FCM token");
                         bukaMainActivity();
                     }
                 });

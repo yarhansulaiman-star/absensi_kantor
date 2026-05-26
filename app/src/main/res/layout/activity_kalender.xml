@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F4FF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <!-- ── HEADER ─────────────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#0F3460"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_media_previous"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="#FFFFFF"
+                android:layout_marginEnd="12dp"
+                android:onClick="finish"
+                android:contentDescription="Kembali"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Kalender Kehadiran"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <!-- ── NAVIGASI BULAN ─────────────────────────────────── -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <ImageButton
+                    android:id="@+id/btnPrevBulan"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@android:drawable/ic_media_rew"
+                    android:background="@drawable/icon_box"
+                    android:backgroundTint="#EEF2FF"
+                    app:tint="#0F3460"
+                    android:contentDescription="Bulan sebelumnya"/>
+
+                <TextView
+                    android:id="@+id/tvBulanTahun"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Mei 2025"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#0F3460"/>
+
+                <ImageButton
+                    android:id="@+id/btnNextBulan"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@android:drawable/ic_media_ff"
+                    android:background="@drawable/icon_box"
+                    android:backgroundTint="#EEF2FF"
+                    app:tint="#0F3460"
+                    android:contentDescription="Bulan berikutnya"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ── PROGRESS ───────────────────────────────────────── -->
+        <ProgressBar
+            android:id="@+id/progressBarKalender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- ── GRID KALENDER ──────────────────────────────────── -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <GridLayout
+                android:id="@+id/gridKalender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="7"
+                android:padding="12dp"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- ── LEGENDA ────────────────────────────────────────── -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="1dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:id="@+id/layoutLegend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutDaftarIzin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="@color/white"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Keterangan"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#0F3460"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Hadir -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="6dp">
+                    <View android:layout_width="14dp" android:layout_height="14dp"
+                        android:background="#4ADE80" android:layout_marginEnd="10dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Hadir" android:textSize="13sp" android:textColor="#333333"/>
+                </LinearLayout>
+
+                <!-- Izin -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="6dp">
+                    <View android:layout_width="14dp" android:layout_height="14dp"
+                        android:background="#FFD700" android:layout_marginEnd="10dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Izin (disetujui)" android:textSize="13sp" android:textColor="#333333"/>
+                </LinearLayout>
+
+                <!-- Sakit -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="6dp">
+                    <View android:layout_width="14dp" android:layout_height="14dp"
+                        android:background="#60A5FA" android:layout_marginEnd="10dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Sakit (disetujui)" android:textSize="13sp" android:textColor="#333333"/>
+                </LinearLayout>
+
+                <!-- Cuti -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="6dp">
+                    <View android:layout_width="14dp" android:layout_height="14dp"
+                        android:background="#FFB347" android:layout_marginEnd="10dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Cuti (disetujui)" android:textSize="13sp" android:textColor="#333333"/>
+                </LinearLayout>
+
+                <!-- Alpha -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="6dp">
+                    <View android:layout_width="14dp" android:layout_height="14dp"
+                        android:background="#FF6B6B" android:layout_marginEnd="10dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Alpha / Tidak hadir" android:textSize="13sp" android:textColor="#333333"/>
+                </LinearLayout>
+
+                <!-- Hari ini -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical">
+                    <View android:layout_width="14dp" android:layout_height="14dp"
+                        android:background="#0F3460" android:layout_marginEnd="10dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Hari ini" android:textSize="13sp" android:textColor="#333333"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>

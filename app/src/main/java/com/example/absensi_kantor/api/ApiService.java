@@ -18,7 +18,6 @@ import retrofit2.http.*;
 
 public interface ApiService {
 
-
     @POST("login")
     Call<LoginResponse> login(@Body Map<String, String> body);
 
@@ -38,13 +37,13 @@ public interface ApiService {
     @Streaming
     Call<ResponseBody> laporanPdf(@Query("tanggal") String tanggal);
 
-
     @GET("gaji")
     Call<GajiResponse> getGaji(
             @Query("karyawan_id") Integer karyawanId,
             @Query("bulan") int bulan,
             @Query("tahun") int tahun
     );
+
     @GET("karyawan/list")
     Call<KaryawanListResponse> getKaryawanList();
 
@@ -54,6 +53,7 @@ public interface ApiService {
     @POST("surat-izin")
     Call<SuratIzinResponse> kirimSuratIzin(@Body Map<String, Object> body);
 
+    // Dipakai di KalenderActivity & SuratIzinActivity untuk mengambil izin milik user login
     @GET("surat-izin")
     Call<SuratIzinResponse> getSuratIzinSaya();
 
@@ -70,5 +70,14 @@ public interface ApiService {
     Call<Void> simpanFcmToken(
             @Header("Authorization") String token,
             @Body Map<String, String> body
+    );
+
+    // Dipakai di MainActivity untuk export slip gaji PDF
+    @GET("gaji/slip/export")
+    @Streaming
+    Call<ResponseBody> exportSlipGaji(
+            @Query("user_id") int userId,
+            @Query("bulan")   int bulan,
+            @Query("tahun")   int tahun
     );
 }
