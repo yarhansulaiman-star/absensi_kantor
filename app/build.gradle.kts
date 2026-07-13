@@ -5,7 +5,6 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-
 val localProps = Properties()
 val localPropsFile = rootProject.file("local.properties")
 if (localPropsFile.exists()) {
@@ -46,7 +45,7 @@ android {
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true  //
+        buildConfig = true
     }
 }
 
@@ -84,19 +83,41 @@ dependencies {
 
     implementation("com.google.android.material:material:1.11.0")
 
-    //Machine learning kit
-    implementation ("com.google.mlkit:face-detection:16.1.5")
+    // Machine Learning Kit - Face Detection
+    implementation("com.google.mlkit:face-detection:16.1.5")
 
     implementation("androidx.activity:activity:1.7.0")
 
+    // OpenStreetMap
     implementation("org.osmdroid:osmdroid-android:6.1.17")
 
-    // FCM
-    implementation("com.google.firebase:firebase-messaging:23.4.1")
+    // Firebase BoM - mengatur versi semua library Firebase secara konsisten
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-messaging")
 
     implementation("androidx.core:core:1.12.0")
 
-    //background
+    // Lottie - background/loading animation
     implementation("com.airbnb.android:lottie:6.4.0")
 
+    // Coroutines - untuk async task (network call, camera analysis) yang lebih rapi
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+
+    // Lifecycle - ViewModel & LiveData, penting untuk CameraX lifecycle-aware
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+
+    // ExifInterface - fix orientasi foto dari kamera (WAJIB untuk foto absensi)
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+
+    // Security Crypto - simpan token/session secara aman (EncryptedSharedPreferences)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // WorkManager - kalau perlu retry upload absensi otomatis saat koneksi jelek
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // SwipeRefreshLayout - kalau ada list riwayat absensi yang bisa di-refresh
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

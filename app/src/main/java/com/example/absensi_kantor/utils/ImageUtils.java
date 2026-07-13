@@ -1,9 +1,14 @@
 package com.example.absensi_kantor.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.util.Base64;
+
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 public class ImageUtils {
 
@@ -11,6 +16,38 @@ public class ImageUtils {
     // Quality 70 → ~30–60 KB per foto vs 300–500 KB sebelumnya (1280px, q90)
     private static final int MAX_SIZE     = 640;
     private static final int JPEG_QUALITY = 70;
+
+    // ✅ TAMBAHAN: Baca rotasi dari EXIF metadata foto.
+    // MediaStore.ACTION_IMAGE_CAPTURE sering menyimpan foto dengan piksel
+    // "mentah" dari sensor, sementara orientasi tegak yang benar disimpan
+    // terpisah di EXIF. Kalau ini diabaikan, bitmap yang diproses ML Kit
+    // bisa sudah miring/berputar dari awal sebelum wajah user ikut miring.
+    public static int bacaRotasiExif(Context context, Uri uri) {
+        try (InputStream is = context.getContentResolver().openInputStream(uri)) {
+            if (is == null) return 0;
+            ExifInterface exif = new ExifInterface(is);
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:  return 90;
+                case ExifInterface.ORIENTATION_ROTATE_180: return 180;
+                case ExifInterface.ORIENTATION_ROTATE_270: return 270;
+                default: return 0;
+            }
+        } catch (Exception e) {
+            return 0; // gagal baca EXIF -> anggap tidak perlu rotasi
+        }
+    }
+
+    // ✅ TAMBAHAN: Putar bitmap sesuai derajat dari EXIF sebelum diproses lebih lanjut
+    public static Bitmap rotateBitmap(Bitmap bitmap, int derajat) {
+        if (derajat == 0) return bitmap;
+        Matrix matrix = new Matrix();
+        matrix.postRotate(derajat);
+        return Bitmap.createBitmap(bitmap, 0, 0,
+                bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
 
     public static Bitmap resizeBitmap(Bitmap bitmap, int maxW, int maxH) {
         int w = bitmap.getWidth();

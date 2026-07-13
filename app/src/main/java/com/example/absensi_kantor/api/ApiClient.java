@@ -19,7 +19,8 @@ public class ApiClient {
 
     public static void init(Context context) {
         if (apiService == null) {
-            SessionManager session = new SessionManager(context);
+
+            SessionManager session = new SessionManager(context.getApplicationContext());
 
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BASIC); // BODY terlalu verbose untuk base64

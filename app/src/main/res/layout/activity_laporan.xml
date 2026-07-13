@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
             android:gravity="center"
-            android:text="😔 Belum ada data absensi hari ini"
+            android:text=" Belum ada data absensi hari ini"
             android:textSize="15sp"
             android:textColor="#AAAAAA"
             android:visibility="gone"/>

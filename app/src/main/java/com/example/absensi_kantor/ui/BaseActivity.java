@@ -5,14 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import com.example.absensi_kantor.api.SessionManager;
 
-/**
- * BaseActivity — semua Activity extends class ini agar dark mode
- * otomatis tersinkronisasi saat Activity dibuka kembali (onResume).
- *
- * Cara pakai:
- *   Ganti "extends AppCompatActivity" → "extends BaseActivity"
- *   di setiap Activity (MainActivity, RiwayatActivity, LaporanActivity, dll.)
- */
 public class BaseActivity extends AppCompatActivity {
 
     @Override

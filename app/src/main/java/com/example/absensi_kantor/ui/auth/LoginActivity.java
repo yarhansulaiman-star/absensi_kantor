@@ -158,10 +158,9 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         String fcmToken = task.getResult();
 
-                        getSharedPreferences("fcm_pref", MODE_PRIVATE)
-                                .edit()
-                                .putString("fcm_token", fcmToken)
-                                .apply();
+                        // ✅ PERBAIKAN: FCM token sekarang disimpan lewat SessionManager
+                        // (EncryptedSharedPreferences), bukan SharedPreferences plain text terpisah lagi.
+                        session.simpanFcmToken(fcmToken);
 
                         Map<String, String> body = new HashMap<>();
                         body.put("fcm_token", fcmToken);

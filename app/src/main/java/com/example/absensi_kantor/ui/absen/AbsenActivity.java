@@ -11,7 +11,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.location.Location;
 import android.media.Image;
@@ -55,13 +54,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @androidx.annotation.OptIn(markerClass = ExperimentalGetImage.class)
 public class AbsenActivity extends AppCompatActivity {
 
-    private static final String TAG                = "AbsenActivity";
-    private static final int    CAMERA_PERMISSION  = 100;
+    private static final String TAG                 = "AbsenActivity";
+    private static final int    CAMERA_PERMISSION   = 100;
     private static final int    LOCATION_PERMISSION = 101;
 
     private static final long  RECOGNITION_INTERVAL_MS = 2000;
     private static final float MIN_CONFIDENCE_PREVIEW  = 50f;
     private static final float MIN_CONFIDENCE_ABSEN    = 50f;
+
+    // ✅ LIVENESS: Konstanta threshold & timeout untuk deteksi kedipan
+    private static final float EYE_OPEN_THRESHOLD   = 0.6f;   // mata dianggap terbuka
+    private static final float EYE_CLOSED_THRESHOLD = 0.25f;  // mata dianggap tertutup
+    private static final long  LIVENESS_TIMEOUT_MS   = 8000;  // batas waktu 1 siklus liveness
+    private static final long  LIVENESS_HOLD_OPEN_MS = 400;   // wajib "kebuka" dulu sesaat sblm mulai
+
+    // ✅ LIVENESS: State machine untuk challenge-response kedipan mata
+    private enum LivenessState {
+        NUNGGU_WAJAH,           // belum ada wajah / mata belum kebuka stabil
+        MATA_TERBUKA_AWAL,      // mata sudah kebuka, siap nunggu kedipan
+        NUNGGU_MATA_TERTUTUP,   // instruksi: silakan berkedip
+        NUNGGU_MATA_TERBUKA_LAGI, // mata sudah kedeteksi tertutup, tunggu kebuka lagi
+        LIVENESS_OK             // lolos! boleh absen
+    }
+
+    private volatile LivenessState livenessState   = LivenessState.NUNGGU_WAJAH;
+    private volatile long          livenessStartTs = 0L;
+    private volatile long          eyesOpenSinceTs = 0L;
 
     private ActivityAbsenBinding        binding;
     private SessionManager              session;
@@ -104,6 +122,10 @@ public class AbsenActivity extends AppCompatActivity {
         faceOverlay = binding.faceOverlay;
 
         Log.d(TAG, "Token: " + session.getToken());
+
+        // ✅ LIVENESS: tombol absen dikunci sampai liveness lolos
+        binding.tombolAbsen.setEnabled(false);
+        resetLiveness();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -224,7 +246,7 @@ public class AbsenActivity extends AppCompatActivity {
         return new CameraSelector.Builder().build();
     }
 
-    // ── Real-time Deteksi Wajah ───────────────────────────────────────────────
+    // ── Real-time Deteksi Wajah + LIVENESS ────────────────────────────────────
 
     @androidx.annotation.OptIn(markerClass = ExperimentalGetImage.class)
     private void deteksiWajahRealtime(ImageProxy imageProxy) {
@@ -241,12 +263,145 @@ public class AbsenActivity extends AppCompatActivity {
         int imgH = imageProxy.getHeight();
 
         faceDetector.process(image)
-                .addOnSuccessListener(faces -> faceOverlay.setFaces(faces, imgW, imgH))
-                .addOnFailureListener(e -> faceOverlay.clear())
+                .addOnSuccessListener(faces -> {
+                    faceOverlay.setFaces(faces, imgW, imgH);
+                    prosesLiveness(faces); // ✅ LIVENESS: cek tiap frame
+                })
+                .addOnFailureListener(e -> {
+                    faceOverlay.clear();
+                    // ✅ LIVENESS: gak ada wajah kedeteksi → anggap terputus, reset
+                    handleWajahHilang();
+                })
                 .addOnCompleteListener(task -> imageProxy.close());
     }
 
-    // ── Real-time Recognition ─────────────────────────────────────────────────
+    // ✅ LIVENESS: Ambil wajah terbesar dari daftar hasil deteksi
+    private Face ambilWajahTerbesarUntukLiveness(List<Face> faces) {
+        if (faces == null || faces.isEmpty()) return null;
+        Face terbesar = null;
+        long luasTerbesar = 0;
+        for (Face f : faces) {
+            Rect b = f.getBoundingBox();
+            long luas = (long) b.width() * b.height();
+            if (luas > luasTerbesar) {
+                luasTerbesar = luas;
+                terbesar = f;
+            }
+        }
+        return terbesar;
+    }
+
+    // ✅ LIVENESS: Inti state machine challenge-response kedipan mata.
+    // Alur: wajah harus kebuka mata dulu (stabil) -> instruksi kedip ->
+    // terdeteksi tertutup -> terdeteksi terbuka lagi -> LIVENESS_OK.
+    // Semua harus terjadi dalam LIVENESS_TIMEOUT_MS, kalau lewat -> reset dari awal.
+    private void prosesLiveness(List<Face> faces) {
+        Face face = ambilWajahTerbesarUntukLiveness(faces);
+        long now = System.currentTimeMillis();
+
+        if (face == null) {
+            handleWajahHilang();
+            return;
+        }
+
+        Float leftEye  = face.getLeftEyeOpenProbability();
+        Float rightEye = face.getRightEyeOpenProbability();
+
+        // Kalau ML Kit gak kasih data probability mata (kadang null), skip frame ini
+        if (leftEye == null || rightEye == null) return;
+
+        boolean mataTerbuka   = leftEye > EYE_OPEN_THRESHOLD && rightEye > EYE_OPEN_THRESHOLD;
+        boolean mataTertutup  = leftEye < EYE_CLOSED_THRESHOLD && rightEye < EYE_CLOSED_THRESHOLD;
+
+        // Kalau sudah lolos, gak perlu diproses ulang sampai direset (misal setelah kirim absen)
+        if (livenessState == LivenessState.LIVENESS_OK) return;
+
+        // Cek timeout siklus liveness yang sedang berjalan
+        if (livenessStartTs > 0 && (now - livenessStartTs) > LIVENESS_TIMEOUT_MS
+                && livenessState != LivenessState.NUNGGU_WAJAH) {
+            Log.d(TAG, "Liveness timeout, reset.");
+            resetLivenessKeAwal("⏳ Waktu habis, silakan coba lagi.");
+            return;
+        }
+
+        switch (livenessState) {
+            case NUNGGU_WAJAH:
+                if (mataTerbuka) {
+                    if (eyesOpenSinceTs == 0) eyesOpenSinceTs = now;
+                    if (now - eyesOpenSinceTs >= LIVENESS_HOLD_OPEN_MS) {
+                        livenessState   = LivenessState.MATA_TERBUKA_AWAL;
+                        livenessStartTs = now;
+                        setStatusUi("👁️ Wajah terdeteksi. Bersiap untuk kedip...");
+                    }
+                } else {
+                    eyesOpenSinceTs = 0;
+                }
+                break;
+
+            case MATA_TERBUKA_AWAL:
+                livenessState = LivenessState.NUNGGU_MATA_TERTUTUP;
+                setStatusUi("😉 Silakan BERKEDIP untuk verifikasi...");
+                break;
+
+            case NUNGGU_MATA_TERTUTUP:
+                if (mataTertutup) {
+                    livenessState = LivenessState.NUNGGU_MATA_TERBUKA_LAGI;
+                    setStatusUi("👀 Bagus! Sekarang buka mata lagi...");
+                }
+                break;
+
+            case NUNGGU_MATA_TERBUKA_LAGI:
+                if (mataTerbuka) {
+                    livenessState = LivenessState.LIVENESS_OK;
+                    setStatusUi("✅ Verifikasi wajah asli berhasil! Silakan tekan Absen.");
+                    setTombolAbsenEnabled(true);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    // ✅ LIVENESS: Dipanggil kalau wajah gak kedeteksi sama sekali di 1 frame.
+    // Kalau state udah di tengah proses kedipan dan wajah hilang, reset ke awal
+    // (supaya orang gak bisa "curang" ganti dari foto ke wajah asli di tengah proses).
+    private void handleWajahHilang() {
+        if (livenessState != LivenessState.NUNGGU_WAJAH
+                && livenessState != LivenessState.LIVENESS_OK) {
+            resetLivenessKeAwal("⚠️ Wajah hilang dari kamera, ulangi verifikasi.");
+        } else if (livenessState == LivenessState.NUNGGU_WAJAH) {
+            eyesOpenSinceTs = 0;
+        }
+    }
+
+    private void resetLivenessKeAwal(String pesan) {
+        livenessState   = LivenessState.NUNGGU_WAJAH;
+        livenessStartTs = 0;
+        eyesOpenSinceTs = 0;
+        setTombolAbsenEnabled(false);
+        setStatusUi(pesan);
+    }
+
+    // ✅ LIVENESS: Reset total, dipanggil saat activity pertama dibuka
+    // atau setelah absen berhasil/gagal terkirim (wajib verifikasi ulang tiap sesi)
+    private void resetLiveness() {
+        livenessState   = LivenessState.NUNGGU_WAJAH;
+        livenessStartTs = 0;
+        eyesOpenSinceTs = 0;
+        setTombolAbsenEnabled(false);
+        setStatusUi("👁️ Posisikan wajah Anda di depan kamera...");
+    }
+
+    private void setTombolAbsenEnabled(boolean enabled) {
+        runOnUiThread(() -> binding.tombolAbsen.setEnabled(enabled));
+    }
+
+    private void setStatusUi(String pesan) {
+        runOnUiThread(() -> setStatus(pesan));
+    }
+
+    // ── Real-time Recognition (preview nama, terpisah dari liveness) ──────────
 
     private void mulaiRealtimeRecognition() {
         recognitionRunnable = new Runnable() {
@@ -327,6 +482,14 @@ public class AbsenActivity extends AppCompatActivity {
     // ── Foto & Absen ──────────────────────────────────────────────────────────
 
     private void ambilFotoDanAbsen() {
+        // ✅ LIVENESS: Gerbang utama — gak boleh absen kalau liveness belum lolos.
+        // Ini jaga-jaga tambahan; tombol seharusnya sudah disabled duluan,
+        // tapi dicek lagi di sini untuk keamanan (defense in depth).
+        if (livenessState != LivenessState.LIVENESS_OK) {
+            Toast.makeText(this, "Verifikasi wajah (kedip) belum selesai!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (imageCapture == null) {
             Toast.makeText(this, "Kamera belum siap!", Toast.LENGTH_SHORT).show();
             return;
@@ -347,7 +510,8 @@ public class AbsenActivity extends AppCompatActivity {
                         if (bitmap == null) {
                             runOnUiThread(() -> {
                                 setStatus("❌ Gagal membaca foto!");
-                                binding.tombolAbsen.setEnabled(true);
+                                // ✅ LIVENESS: kalau gagal, wajib verifikasi ulang, jangan asal re-enable tombol
+                                resetLiveness();
                             });
                             return;
                         }
@@ -359,13 +523,13 @@ public class AbsenActivity extends AppCompatActivity {
                     public void onError(@NonNull ImageCaptureException e) {
                         runOnUiThread(() -> {
                             setStatus("❌ Gagal ambil foto: " + e.getMessage());
-                            binding.tombolAbsen.setEnabled(true);
+                            resetLiveness();
                         });
                     }
                 });
     }
 
-    // ── ML Kit: Deteksi Wajah ─────────────────────────────────────────────────
+    // ── ML Kit: Deteksi Wajah pada foto final sebelum kirim ────────────────────
 
     private void deteksiWajahLaluKirim(Bitmap bitmap) {
         runOnUiThread(() -> setStatus("🔍 Mendeteksi wajah..."));
@@ -377,7 +541,7 @@ public class AbsenActivity extends AppCompatActivity {
                     if (faces.isEmpty()) {
                         runOnUiThread(() -> {
                             setStatus("⚠️ Wajah tidak terdeteksi!\nPastikan wajah terlihat jelas.");
-                            binding.tombolAbsen.setEnabled(true);
+                            resetLiveness();
                         });
                         return;
                     }
@@ -392,7 +556,7 @@ public class AbsenActivity extends AppCompatActivity {
                             && leftEye < 0.3f && rightEye < 0.3f) {
                         runOnUiThread(() -> {
                             setStatus("⚠️ Mata tertutup! Buka mata dan coba lagi.");
-                            binding.tombolAbsen.setEnabled(true);
+                            resetLiveness();
                         });
                         return;
                     }
@@ -402,7 +566,7 @@ public class AbsenActivity extends AppCompatActivity {
                     if (Math.abs(rotY) > 30 || Math.abs(rotZ) > 30) {
                         runOnUiThread(() -> {
                             setStatus("⚠️ Wajah terlalu miring! Hadapkan ke kamera.");
-                            binding.tombolAbsen.setEnabled(true);
+                            resetLiveness();
                         });
                         return;
                     }
@@ -413,7 +577,7 @@ public class AbsenActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> runOnUiThread(() -> {
                     setStatus("❌ Gagal deteksi wajah: " + e.getMessage());
-                    binding.tombolAbsen.setEnabled(true);
+                    resetLiveness();
                 }));
     }
 
@@ -437,7 +601,8 @@ public class AbsenActivity extends AppCompatActivity {
                                            @NonNull Response<AbsenResponse> response) {
                         runOnUiThread(() -> {
                             binding.progressBar.setVisibility(View.GONE);
-                            binding.tombolAbsen.setEnabled(true);
+                            // ✅ LIVENESS: apapun hasilnya, wajib verifikasi ulang untuk absen berikutnya
+                            resetLiveness();
 
                             if (!response.isSuccessful()) {
                                 setStatus("❌ Server error: " + response.code());
@@ -474,7 +639,7 @@ public class AbsenActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Call<AbsenResponse> call, @NonNull Throwable t) {
                         runOnUiThread(() -> {
                             binding.progressBar.setVisibility(View.GONE);
-                            binding.tombolAbsen.setEnabled(true);
+                            resetLiveness();
                             setStatus("❌ Gagal konek: " + t.getMessage());
                         });
                     }
@@ -562,6 +727,8 @@ public class AbsenActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // ✅ LIVENESS: setiap kembali ke activity ini, wajib verifikasi ulang dari nol
+        resetLiveness();
         if (recognitionRunnable != null)
             recognitionHandler.postDelayed(recognitionRunnable, RECOGNITION_INTERVAL_MS);
     }
