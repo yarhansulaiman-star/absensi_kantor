@@ -1,10 +1,13 @@
 package com.example.absensi_kantor.ui.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.absensi_kantor.ui.MainActivity;
@@ -12,6 +15,7 @@ import com.example.absensi_kantor.api.ApiClient;
 import com.example.absensi_kantor.api.SessionManager;
 import com.example.absensi_kantor.databinding.ActivityLoginBinding;
 import com.example.absensi_kantor.model.auth.LoginResponse;
+import com.example.absensi_kantor.model.auth.ForgotPasswordResponse;
 import com.example.absensi_kantor.utils.AlarmScheduler;
 import com.example.absensi_kantor.utils.NotificationHelper;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -52,6 +56,9 @@ public class LoginActivity extends AppCompatActivity {
 
         binding.tombolRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
+
+        // ✅ FITUR BARU: Lupa Password
+        binding.txtLupaPassword.setOnClickListener(v -> tampilkanDialogLupaPassword());
     }
 
     private void prosesLogin() {
@@ -194,5 +201,54 @@ public class LoginActivity extends AppCompatActivity {
     private void bukaMainActivity() {
         startActivity(new Intent(this, MainActivity.class));
         finish();
+    }
+
+    // ===================== ✅ FITUR BARU: LUPA PASSWORD =====================
+
+    private void tampilkanDialogLupaPassword() {
+        EditText etEmail = new EditText(this);
+        etEmail.setHint("Email terdaftar");
+        etEmail.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Lupa Password")
+                .setMessage("Masukkan email yang terdaftar, link reset password akan dikirim ke email tersebut.")
+                .setView(etEmail)
+                .setPositiveButton("Kirim", (dialog, which) -> {
+                    String email = etEmail.getText().toString().trim();
+                    if (email.isEmpty()) {
+                        Toast.makeText(this, "Email wajib diisi", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    kirimLupaPassword(email);
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void kirimLupaPassword(String email) {
+        Map<String, String> body = new HashMap<>();
+        body.put("email", email);
+
+        ApiClient.getService().lupaPassword(body).enqueue(new Callback<ForgotPasswordResponse>() {
+            @Override
+            public void onResponse(Call<ForgotPasswordResponse> call,
+                                   Response<ForgotPasswordResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(LoginActivity.this,
+                            response.body().pesan, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(LoginActivity.this,
+                            "Gagal mengirim permintaan reset", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ForgotPasswordResponse> call, Throwable t) {
+                Log.e(TAG, "lupaPassword onFailure: " + t.getMessage());
+                Toast.makeText(LoginActivity.this,
+                        "Gagal konek ke server!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

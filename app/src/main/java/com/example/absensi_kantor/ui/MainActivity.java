@@ -2,7 +2,8 @@ package com.example.absensi_kantor.ui;
 
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
+import com.example.absensi_kantor.utils.NotificationHelper;
+import com.example.absensi_kantor.utils.service.FcmTokenManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,6 +66,10 @@ public class MainActivity extends BaseActivity {
         ApiClient.reset();
         ApiClient.init(this);
         session = new SessionManager(this);
+
+        // ✅ TAMBAHAN: setup notifikasi lokal & kirim FCM token ke server
+        NotificationHelper.createNotificationChannels(this);
+        FcmTokenManager.ambilDanKirimToken(this);
 
         setSupportActionBar(binding.toolbar);
 

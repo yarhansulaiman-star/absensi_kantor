@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.*;
@@ -40,7 +39,7 @@ public class ProfilActivity extends AppCompatActivity {
     private TextView txtGajiPokok, txtTunjangan, txtTotalPenghasilan;
     private SwitchCompat switchDarkMode;
     private TextView txtVersi;
-    private Button btnGantiPassword, btnTentang, btnLogout;
+    private Button btnTentang, btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,9 +113,8 @@ public class ProfilActivity extends AppCompatActivity {
         switchDarkMode = findViewById(R.id.switchDarkMode);
         txtVersi       = findViewById(R.id.txtVersi);
 
-        btnGantiPassword = findViewById(R.id.btnGantiPassword);
-        btnTentang       = findViewById(R.id.btnTentang);
-        btnLogout        = findViewById(R.id.btnLogout);
+        btnTentang = findViewById(R.id.btnTentang);
+        btnLogout  = findViewById(R.id.btnLogout);
     }
 
     private void loadAkun() {
@@ -276,7 +274,6 @@ public class ProfilActivity extends AppCompatActivity {
             );
         });
 
-        btnGantiPassword.setOnClickListener(v -> showGantiPasswordDialog());
         btnTentang.setOnClickListener(v -> showTentangDialog());
 
         btnLogout.setOnClickListener(v ->
@@ -295,59 +292,6 @@ public class ProfilActivity extends AppCompatActivity {
                         .setNegativeButton("Batal", null)
                         .show()
         );
-    }
-
-    private void showGantiPasswordDialog() {
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(48, 24, 48, 8);
-
-        EditText etPasswordLama = new EditText(this);
-        etPasswordLama.setHint("Password Lama");
-        etPasswordLama.setInputType(
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(etPasswordLama);
-
-        EditText etPasswordBaru = new EditText(this);
-        etPasswordBaru.setHint("Password Baru");
-        etPasswordBaru.setInputType(
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(etPasswordBaru);
-
-        EditText etKonfirmasi = new EditText(this);
-        etKonfirmasi.setHint("Konfirmasi Password Baru");
-        etKonfirmasi.setInputType(
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(etKonfirmasi);
-
-        new AlertDialog.Builder(this)
-                .setTitle("Ganti Password")
-                .setView(layout)
-                .setPositiveButton("Simpan", (dialog, which) -> {
-                    String lama       = etPasswordLama.getText().toString().trim();
-                    String baru       = etPasswordBaru.getText().toString().trim();
-                    String konfirmasi = etKonfirmasi.getText().toString().trim();
-
-                    if (lama.isEmpty() || baru.isEmpty() || konfirmasi.isEmpty()) {
-                        Toast.makeText(this, "Semua field wajib diisi",
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    if (!baru.equals(konfirmasi)) {
-                        Toast.makeText(this, "Password baru tidak cocok",
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    if (baru.length() < 6) {
-                        Toast.makeText(this, "Password minimal 6 karakter",
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Toast.makeText(this, "Fitur ganti password akan segera tersedia",
-                            Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Batal", null)
-                .show();
     }
 
     private void showTentangDialog() {

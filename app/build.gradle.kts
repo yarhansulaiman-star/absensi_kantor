@@ -120,4 +120,6 @@ dependencies {
 
     // SwipeRefreshLayout - kalau ada list riwayat absensi yang bisa di-refresh
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    implementation("com.android.volley:volley:1.2.1")
 }

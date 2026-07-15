@@ -300,39 +300,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- ===================== KARTU KEAMANAN ===================== -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🔒 Keamanan"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorPrimary"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp"/>
-
-                    <Button
-                        android:id="@+id/btnGantiPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="🔑 Ganti Password"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
             <!-- ===================== KARTU TENTANG ===================== -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"

@@ -18,9 +18,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Cek apakah mode saat ini berbeda dengan preferensi tersimpan.
-        // Jika beda (misalnya user toggle dari ProfilActivity lalu kembali),
-        // recreate() akan menerapkan tema yang benar.
+
         SessionManager session = new SessionManager(this);
         int targetMode = session.isDarkMode()
                 ? AppCompatDelegate.MODE_NIGHT_YES

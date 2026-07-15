@@ -3,6 +3,7 @@ package com.example.absensi_kantor.api;
 import com.example.absensi_kantor.model.*;
 import com.example.absensi_kantor.model.absen.AbsenResponse;
 import com.example.absensi_kantor.model.absen.RiwayatResponse;
+import com.example.absensi_kantor.model.auth.ForgotPasswordResponse;
 import com.example.absensi_kantor.model.auth.LoginResponse;
 import com.example.absensi_kantor.model.auth.RegisterResponse;
 import com.example.absensi_kantor.model.gaji.GajiResponse;
@@ -23,6 +24,9 @@ public interface ApiService {
 
     @POST("register/multi")
     Call<RegisterResponse> registerMulti(@Body Map<String, Object> body);
+
+    @POST("/forgot-password")
+    Call<ForgotPasswordResponse> lupaPassword(@Body Map<String, String> body);
 
     @POST("absen")
     Call<AbsenResponse> absen(@Body Map<String, Object> body);
@@ -53,7 +57,7 @@ public interface ApiService {
     @POST("surat-izin")
     Call<SuratIzinResponse> kirimSuratIzin(@Body Map<String, Object> body);
 
-    // Dipakai di KalenderActivity & SuratIzinActivity untuk mengambil izin milik user login
+
     @GET("surat-izin")
     Call<SuratIzinResponse> getSuratIzinSaya();
 
@@ -79,5 +83,7 @@ public interface ApiService {
             @Query("user_id") int userId,
             @Query("bulan")   int bulan,
             @Query("tahun")   int tahun
+
+
     );
 }
