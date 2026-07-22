@@ -57,8 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         binding.tombolRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
 
-        // ✅ FITUR BARU: Lupa Password
-        binding.txtLupaPassword.setOnClickListener(v -> tampilkanDialogLupaPassword());
+        binding.txtLupaPassword.setOnClickListener(v ->
+                startActivity(new Intent(this, LupaPasswordActivity.class)));
     }
 
     private void prosesLogin() {

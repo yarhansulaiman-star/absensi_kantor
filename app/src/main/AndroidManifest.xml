@@ -41,6 +41,7 @@
 
         <activity android:name=".ui.MainActivity"                  android:exported="false" />
         <activity android:name=".ui.auth.RegisterActivity"           android:exported="false" />
+        <activity android:name=".ui.auth.LupaPasswordActivity"       android:exported="false" />
         <activity android:name=".ui.absen.AbsenActivity"              android:exported="false" />
         <activity android:name=".ui.gaji.GajiActivity"               android:exported="false" />
         <activity android:name=".ui.laporan.LaporanActivity"            android:exported="false" />
